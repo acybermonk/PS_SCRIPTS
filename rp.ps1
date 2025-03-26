@@ -255,16 +255,16 @@ New-Item -ItemType File -Name PingIt.ps1 -Value $fileText -Path "$env:USERPROFIL
 # Running Log
     $Global:RunningLog = "$env:USERPROFILE\$Global:AppName\$Global:AppVer\rp.log"
     # Check and Create Log directory
-    Write-Host "Checking for Log Directory"
+    #Write-Host "Checking for Log Directory"
     if (-not (Test-Path $env:USERPROFILE\$Global:AppName)){
         New-Item -ItemType Directory -Name $Global:AppName -Path $env:USERPROFILE -Confirm:$false -Force | Out-Null
         New-Item -ItemType Directory -Name $Global:AppVer -Path $env:USERPROFILE\$Global:AppName -Confirm:$false -Force | Out-Null
-        Write-Host "    Generating Log" -ForegroundColor Yellow
+        #Write-Host "    Generating Log" -ForegroundColor Yellow
         New-Item -ItemType File -Name rp.log -Path $env:USERPROFILE\$Global:AppName\$Global:AppVer -Confirm:$false -Force | Out-Null
         # Test
-        Write-Host "Testing Log"
+        #Write-Host "Testing Log"
         if (test-path $Global:RunningLog){
-            Write-Host "    Log: Verified" -ForegroundColor Yellow
+            #Write-Host "    Log: Verified" -ForegroundColor Yellow
         }else{
             [System.Windows.Forms.MessageBox]::Show("Failed to verify log file. EL01", "Error - Log Unverified", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
         }
@@ -272,30 +272,30 @@ New-Item -ItemType File -Name PingIt.ps1 -Value $fileText -Path "$env:USERPROFIL
         if (-not (Test-Path $env:USERPROFILE\$Global:AppName\$Global:AppVer)){
             New-Item -ItemType Directory -Name $Global:AppVer -Path $env:USERPROFILE\$Global:AppName -Confirm:$false -Force | Out-Null
             New-Item -ItemType File -Name rp.log -Path $env:USERPROFILE\$Global:AppName\$Global:AppVer -Confirm:$false -Force | Out-Null
-            Write-Host "    Generating Log" -ForegroundColor Yellow
-            Write-Host "    Log Directory: New version Created" -ForegroundColor Yellow
+            #Write-Host "    Generating Log" -ForegroundColor Yellow
+            #Write-Host "    Log Directory: New version Created" -ForegroundColor Yellow
             # Test
-            Write-Host "Testing Log"
+            #Write-Host "Testing Log"
             if (test-path $Global:RunningLog){
-                Write-Host "    Log: Verified" -ForegroundColor Yellow
+                #Write-Host "    Log: Verified" -ForegroundColor Yellow
             }else{
                 [System.Windows.Forms.MessageBox]::Show("Failed to verify log file. EL02.", "Error - Log Unverified", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
             }
         }else{
-            Write-Host "    Log Directory: Version Found" -ForegroundColor Yellow
+            #Write-Host "    Log Directory: Version Found" -ForegroundColor Yellow
             if (-not ($Global:RunningLog)){
                 New-Item -ItemType File -Name rp.log -Path $env:USERPROFILE\$Global:AppName\$Global:AppVer -Confirm:$false -Force | Out-Null
-                Write-Host "    Generating Log" -ForegroundColor Yellow
-                Write-Host "Creating log"
+                #Write-Host "    Generating Log" -ForegroundColor Yellow
+                #Write-Host "Creating log"
                 # Test
-                Write-Host "Testing Log"
+                #Write-Host "Testing Log"
                 if (test-path $Global:RunningLog){
-                    Write-Host "    Log Path: Verified" -ForegroundColor Yellow
+                    #Write-Host "    Log Path: Verified" -ForegroundColor Yellow
                 }else{
                     [System.Windows.Forms.MessageBox]::Show("Failed to verify log file. EL03", "Error - Log Unverified", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
                 }
             }else{
-                Write-Host "    Log: Verified" -ForegroundColor Yellow
+                #Write-Host "    Log: Verified" -ForegroundColor Yellow
             }
         }
     }
@@ -351,42 +351,49 @@ $Main_Form.Add_FormClosing({
     $Main_Form.Dispose()
 })
 $Main_Form.Add_Load({
+    $Main_Form.TopLevel = $true
     # Check file directory
-    Write-Host "Checking for App Directory"
+    #Write-Host "Checking for App Directory"
     $appDirPath = "$env:USERPROFILE\Documents"
     if (-not (Test-path $appDirPath\$Global:AppName)){
-        Write-Host "    Creating App Directory" -ForegroundColor Yellow
+        #Write-Host "    Creating App Directory" -ForegroundColor Yellow
         New-item -ItemType Directory -Name $AppName -Path $appDirPath -Confirm:$false -Force | Out-Null
         New-Item -ItemType Directory -Name logs -Path $appDirPath\$AppName -Confirm:$false -Force | Out-Null
         # Test
-        Write-Host "Testing App Directory"
+        #Write-Host "Testing App Directory"
         if (Test-Path $appDirPath\$AppName){
             # Verify Directory
-            Write-Host "    App Directory: Verified" -ForegroundColor Yellow
+            #Write-Host "    App Directory: Verified" -ForegroundColor Yellow
             # Test
-            Write-Host "Testing log directory"
+            #Write-Host "Testing log directory"
             if (Test-Path "$appDirPath\$AppName\logs"){
-                Write-Host "    Logs Directory: Verified"
+                #Write-Host "    Logs Directory: Verified"
             }else{
                 [System.Windows.Forms.MessageBox]::Show("Failed to verify logs directory. EL11.", "Error - Local Log", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+                $error = "Error - Local Log : Failed to verify logs directory. EL11."
+                UtilErr $error
             }
         }else{
             [System.Windows.Forms.MessageBox]::Show("Failed to verify logs directory. EL12", "Error - Local Log", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            $error = "Error - Local Log : Failed to verify logs directory. EL12."
+            UtilErr $error
         }
     }else{
-        Write-Host "    App Directory: Verified" -ForegroundColor Yellow
+        #Write-Host "    App Directory: Verified" -ForegroundColor Yellow
         if (-not (Test-Path "$appDirPath\$AppName\logs")){
-            Write-Host "    Creating Log Directory" -ForegroundColor Yellow
+            #Write-Host "    Creating Log Directory" -ForegroundColor Yellow
             New-Item -ItemType Directory -Name logs -Path $appDirPath\$AppName -Confirm:$false -Force | Out-Null
             # Test
-            Write-Host "Testing Log Directory"
+            #Write-Host "Testing Log Directory"
             if (Test-Path "$appDirPath\$AppName\logs"){
-                Write-Host "    Log Directory: Verified"
+                #Write-Host "    Log Directory: Verified"
             }else{
                 [System.Windows.Forms.MessageBox]::Show("Failed to verify logs directory . EL13.", "Error - Local Log", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+                $error = "Error - Local Log : Failed to verify logs directory. EL13."
+                UtilErr $error
             }
         }else{
-            Write-Host "    Log Directory: Verified" -ForegroundColor Yellow
+            #Write-Host "    Log Directory: Verified" -ForegroundColor Yellow
         }
     }
 })
@@ -475,6 +482,8 @@ $ActionSelectFile_Button.Add_click({
         } 
     }else{
         [System.Windows.Forms.MessageBox]::Show("Failed selecting Action path. Not a valid file path.", "Error - Action File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+        $error = "Error - Action File Select : Failed selecting Action path. Not a valid file path."
+        UtilErr $error
     }
 })
 
@@ -522,15 +531,23 @@ $TargetSelectFile_Button.Add_Click({
         }
     }else{
         [System.Windows.Forms.MessageBox]::Show("Failed selecting Target path. Not a valid file path.", "Error - Target File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+        $error = "Error - Target File Select : Failed selecting Target path. Not a valid file path."
+        UtilErr $error
     }
 })
+
+$TargetFormat_Label = New-Object $Label_Object
+$TargetFormat_Label.Text = "Format : COMPUTER;USER;GROUP"
+$TargetFormat_Label.AutoSize = $true
+$TargetFormat_Label.Font = New-Object System.Drawing.Font("Arial",9)
+$TargetFormat_Label.Location = New-Object System.Drawing.Point(175,130)
 
 $ProcessPrbe_Button = New-Object $Button_Object
 $ProcessPrbe_Button.TabIndex = "2"
 $ProcessPrbe_Button.Text = "==>==>>"
 $ProcessPrbe_Button.width = "100"
 $ProcessPrbe_Button.TextAlign = "MiddleCenter"
-$ProcessPrbe_Button.Location = New-Object System.Drawing.Point(200,150)
+$ProcessPrbe_Button.Location = New-Object System.Drawing.Point(200,155)
 $ProcessPrbe_Button.Add_click({
     GetShortDate
     $LocalLog = "$env:USERPROFILE\Documents\$AppName\logs\$ShortDate.log"
@@ -551,10 +568,14 @@ $ProcessPrbe_Button.Add_click({
                 
             }else{
                 [System.Windows.Forms.MessageBox]::Show("Failed to Run. Action or Target not valid file path.", "Error - Failed", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+                $error = "Error - Failed : Failed to Run. Action or Target not valid file path."
+                UtilErr $error
             }
         }
     }else{
         [System.Windows.Forms.MessageBox]::Show("Failed to Run. Missing Action or Target file.", "Error - Missing File Path", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+        $error = "Error - Missing File Path : Failed to Run. Missing Action or Target file."
+        UtilErr $error
     }
 })
 
@@ -591,6 +612,7 @@ $ToolbarCLear_Menu.Add_Click({
     }
 })
 
+# Edit Menu
     $EditMenu_EditAction = New-Object System.Windows.Forms.ToolStripMenuItem("Edit Action")
     $EditMenu_EditAction.Enabled = $false
     $EditMenu_EditAction.Add_Click({
@@ -599,6 +621,8 @@ $ToolbarCLear_Menu.Add_Click({
             Start-Process -FilePath powershell_ise.exe -ArgumentList $ActionPath
         }else{
             [System.Windows.Forms.MessageBox]::Show("Failed to edit Action Path. Not a valid file path.", "Error - Edit Action", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            $error = "Error - Edit Action : Failed to edit Action Path. Not a valid file path."
+            UtilErr $error
         }
     })
 
@@ -610,6 +634,8 @@ $ToolbarCLear_Menu.Add_Click({
             Start-Process -FilePath $DefaultEditor -ArgumentList $TargetPath
         }else{
             [System.Windows.Forms.MessageBox]::Show("Failed to edit Target Path. Not a valid file path.", "Error - Edit Target", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            $error = "Error - Edit Target : Failed to edit Target Path. Not a valid file path."
+            UtilErr $error
         }
     })
 
@@ -632,6 +658,7 @@ $Main_Form.Controls.AddRange(@(
     $TargetSelectFile_TextBox
     $ActionSelectFile_Button
     $TargetSelectFile_Button
+    $TargetFormat_Label
     $ProcessPrbe_Button
     $Copyright_Label
 ))
