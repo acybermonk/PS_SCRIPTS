@@ -29,7 +29,7 @@ Set-StrictMode -Version Latest
 # App Executing Path
     $Global:ExecutePath = Get-Location
     $Global:DefaultEditor = "notepad.exe"
-    $Global:DefaultEditor = "notepad++.exe"
+    #$Global:DefaultEditor = "notepad++.exe"
 # Add Form functionality
 	Add-Type -AssemblyName System.Windows.Forms, System.Drawing
     [System.Windows.Forms.Application]::EnableVisualStyles()
@@ -58,7 +58,7 @@ $fileText =    '# Ping It
                     }
                 # Get date abriviation
                     function GetShortDate{
-                        $Global:ShortDate = Get-Date -Format dd-MM-yyyy
+                        $Global:ShortDate = Get-Date -Format dd-MM-yyyy_HH-mm-ss
                     }
                 # Parent App Variables (Updated)
 	                $Global:AppName = "RiP"
@@ -152,8 +152,11 @@ $fileText =    '# Ping It
                         }elseif ($length -eq 2){
                             $system = $dataSplit[0]
                             $user = $dataSplit[1]
+                            $group = $null
                         }elseif ($length -eq 1){
                             $system = $dataSplit[0]
+                            $user = $null
+                            $group = $null
                         }
                         # ping it
                         $pingCheck = ping $system -n 1
@@ -167,9 +170,10 @@ $fileText =    '# Ping It
                                 # log header
                                 getDate
                                 localLogWrite "Running $ActionType Process : $Date`n$username;System $system;User $user"
-                                
+                                localLogWrite "Action Path : $ActionPath"
+
                                 if ($ActionType -eq "powershell.exe"){
-                                    $process = Start-Process -Wait -PassThru -FilePath $ActionType -Verb RunAs -ArgumentList $ActionPath,$system,$user,$group
+                                    $process = Start-Process -FilePath $ActionType -Verb RunAs -Wait -PassThru -ArgumentList "-File $ActionPath $system $user $group"
                                 }elseif ($ActionType -eq "cmd.exe"){
                                     $process = Start-Process -Wait -PassThru -FilePath $ActionType -Verb RunAs -ArgumentList "/c $ActionPath $system $user $group"
                                 }
@@ -204,8 +208,8 @@ $fileText =    '# Ping It
                             Write-Host("Removing : ${d}")
                             localLogWrite "Removed ${d}"
                             $c += 1
-                            $out = Get-Content $Global:FilePath | Select-String -Pattern $d -notmatch 
-                            Set-Content -Path $Global:FilePath -Value $out
+                            $out = Get-Content $TargetPath | Select-String -Pattern $d -notmatch 
+                            Set-Content -Path $TargetPath -Value $out
                         }
                         Write-Host("..")
                         if ($c -ne 0){
@@ -226,6 +230,7 @@ $fileText =    '# Ping It
                             $dataSplit = $null
                             $system = $null
                             $user = $null
+                            $group = $null
                             $pingCheck = $null
                             $ActionType = $null
                             $ActionPath = $null
@@ -233,7 +238,9 @@ $fileText =    '# Ping It
                             $TargetPath = $null
                             $Global:dataCount = 0
                             $minutes = $sleep / 60
-                            Write-Host -ForegroundColor Magenta "Sleep for ${minutes} minutes. Please wait..."
+                            Write-Host -ForegroundColor Magenta "*PREPARING TO LOOP DATA*"
+                            localLogWrite "*PREPARING TO LOOP DATA*"
+                            Write-Host -ForegroundColor Magenta "Sleeping for ${minutes} minutes. Please wait..."
                             Start-Sleep -Seconds $sleep
                             doIt
                         }else{
@@ -243,7 +250,6 @@ $fileText =    '# Ping It
                     }else{
                         Write-Host("*COMPLETED ALL ATTEMPTS*")
                         localLogWrite "*COMPLETED ALL ATTEMPTS*"
-                        #Pause
                         exit
                     }
                 }
@@ -564,7 +570,7 @@ $ProcessPrbe_Button.Add_click({
                     $ActionType = "cmd.exe"
                 }
 
-                Start-Process -FilePath "powershell.exe" -ArgumentList "$env:USERPROFILE\$AppName\$AppVer\PingIt.ps1",$ActionPath,$TargetPath
+                Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList "$env:USERPROFILE\$AppName\$AppVer\PingIt.ps1",$ActionPath,$TargetPath
                 
             }else{
                 [System.Windows.Forms.MessageBox]::Show("Failed to Run. Action or Target not valid file path.", "Error - Failed", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
