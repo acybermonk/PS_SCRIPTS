@@ -3,8 +3,8 @@
 #    -----------------------------------------
 #    Application Name : PingIt 1.0 GUI (RiP)
 #    Created by       : Daniel Krysty
-#    Date started     : March 2025
-#    Current as of    : March 2025
+#    Date started     : April 2025
+#    Current as of    : April 2025
 #    -----------------------------------------------------------------------------------
 #    Functionality    : Loop through list of computers or users performing a script
 #                     :
@@ -24,7 +24,8 @@ Set-StrictMode -Version Latest
 	$Global:AppName = "RiP"
 	$Global:AppVer = "1.0"
     $Global:Copyright = [System.Net.WebUtility]::HtmlDecode("&#169;")
-    $Global:CpDate = "Oct. 2024"
+    $Global:CpDate = "April 2025"
+    $Global:Author = "DK"
     $Global:Username = whoami
 # App Executing Path
     $Global:ExecutePath = Get-Location
@@ -42,7 +43,8 @@ Set-StrictMode -Version Latest
     $FileSelect_Object = $FileBrowser = [System.Windows.Forms.OpenFileDialog]
 	#$RichTextbox_Object = [System.Windows.Forms.RichTextBox]
 	$ToolbarMenuStrip_Object = [System.Windows.Forms.MenuStrip]
-
+# Default File Path
+    $Default_FilePath = "$env:USERPROFILE\Documents\RiP"
 # Write PingIt file
 $fileText =    '# Ping It
                 param(
@@ -65,6 +67,7 @@ $fileText =    '# Ping It
 	                $Global:AppVer = "1.0"
                     $Global:Copyright = [System.Net.WebUtility]::HtmlDecode("&#169;")
                     $Global:CpDate = "Oct. 2024"
+                    $Global:Author = "DK"
                 # Username
                     $Global:Username = whoami
                 # Internal Ping Variables
@@ -358,6 +361,7 @@ $Main_Form.Add_FormClosing({
 })
 $Main_Form.Add_Load({
     $Main_Form.TopLevel = $true
+    $Main_Form.Add_Shown({ $this.Activate() })
     # Check file directory
     #Write-Host "Checking for App Directory"
     $appDirPath = "$env:USERPROFILE\Documents"
@@ -422,6 +426,10 @@ $ActionSelectFile_Textbox = New-Object $Textbox_Object
 $ActionSelectFile_Textbox.Size = New-Object System.Drawing.Point(250,75)
 $ActionSelectFile_Textbox.Font = New-Object System.Drawing.Font("Calibri",12,[System.Drawing.FontStyle]::Bold)
 $ActionSelectFile_Textbox.Location = New-Object System.Drawing.Point(150,50)
+$ActionSelectFile_Textbox.ReadOnly = $true
+$ActionSelectFile_Textbox.Enabled = $false
+$ActionSelectFile_Textbox.BackColor = [System.Drawing.Color]::LightSkyBlue
+$ActionSelectFile_Textbox.ForeColor = [System.Drawing.Color]::Black
 $ActionSelectFile_Textbox.Add_TextChanged({
     $ActionPath = $ActionSelectFile_Textbox.Text
     if (-not ([string]::IsNullOrEmpty($ActionPath)) -or -not([string]::IsNullOrWhiteSpace($ActionPath))){
@@ -435,6 +443,10 @@ $TargetSelectFile_TextBox = New-Object $Textbox_Object
 $TargetSelectFile_TextBox.Size = New-Object System.Drawing.Point(250,75)
 $TargetSelectFile_TextBox.Font = New-Object System.Drawing.Font("Calibri",12,[System.Drawing.FontStyle]::Bold)
 $TargetSelectFile_TextBox.Location = New-Object System.Drawing.Point(150,100)
+$TargetSelectFile_TextBox.ReadOnly = $true
+$TargetSelectFile_TextBox.Enabled = $false
+$TargetSelectFile_TextBox.BackColor = [System.Drawing.Color]::LightSkyBlue
+$TargetSelectFile_TextBox.ForeColor = [System.Drawing.Color]::Black
 $TargetSelectFile_TextBox.Add_TextChanged({
     $TargetPath = $TargetSelectFile_TextBox.Text
     if (-not ([string]::IsNullOrEmpty($TargetPath)) -or -not([string]::IsNullOrWhiteSpace($TargetPath))){
@@ -491,6 +503,9 @@ $ActionSelectFile_Button.Add_click({
         $error = "Error - Action File Select : Failed selecting Action path. Not a valid file path."
         UtilErr $error
     }
+    $ActionSelectFile_Textbox.SelectionStart = $ActionSelectFile_Textbox.Text.Length
+    #$ActionSelectFile_Textbox.ScrollToCaret()
+
 })
 
 $TargetSelectFile_Button = New-Object $Button_Object
@@ -540,6 +555,8 @@ $TargetSelectFile_Button.Add_Click({
         $error = "Error - Target File Select : Failed selecting Target path. Not a valid file path."
         UtilErr $error
     }
+    $TargetSelectFile_TextBox.SelectionStart = $TargetSelectFile_TextBox.Text.Length
+    #$TargetSelectFile_TextBox.ScrollToCaret()
 })
 
 $TargetFormat_Label = New-Object $Label_Object
@@ -650,7 +667,7 @@ $ToolbarCLear_Menu.Add_Click({
     $Toolbar_Menu.Items.AddRange(@($ToolbarEdit_Menu,$ToolbarCLear_Menu)) | Out-Null
 
 $Copyright_Label = New-Object $Label_Object
-$Copyright_Label.Text = "$Copyright $Global:CpDate"
+$Copyright_Label.Text = "$Author $Copyright $Global:CpDate"
 $Copyright_Label.Font = New-Object System.Drawing.Font("Calibri",9,[System.Drawing.FontStyle]::Bold)
 $Copyright_Label.AutoSize = $true
 $Copyright_Label.Location = New-Object System.Drawing.Point(390,175)
