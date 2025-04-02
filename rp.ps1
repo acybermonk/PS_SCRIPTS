@@ -74,7 +74,7 @@ $fileText =    '# Ping It
                     [System.Collections.ArrayList]$Global:found = @()
                     $Global:i = 0
                     $Global:c = 0
-                    $Global:tryCount = 574 # 24hrs
+                    $Global:tryCount = 350 # longer will trigger infinite loop error
                     $Global:sleep = 300 # 5 minutes
                     $Global:dataCount = 0
                     [System.Collections.ArrayList]$Global:FileList = @()
@@ -103,10 +103,10 @@ $fileText =    '# Ping It
                     Write-Host -ForegroundColor Magenta "Tartget Path : $TargetPath"
                     Write-Host -ForegroundColor Magenta "Username     : $username"
                     Write-Host -ForegroundColor Magenta "-----------------------------------"
-                    Write-Host -ForegroundColor Magenta "Attempts : $Global:tryCount"
+                    Write-Host -ForegroundColor Magenta "Max Attempts : $Global:tryCount"
                     getDate
                     localLogWrite "Start : $Global:Date`n$username"
-                    localLogWrite "Attempts : $Global:tryCount"
+                    localLogWrite "Max Attempts : $Global:tryCount"
                 }
                 displayHeader
                 getDate
@@ -349,278 +349,283 @@ New-Item -ItemType File -Name PingIt.ps1 -Value $fileText -Path "$env:USERPROFIL
 # Main Form Element
 #==================
 
-$Main_Form = New-Object $Form_Object
-$Main_Form.Text = "$AppName : $AppVer"
-$Main_Form.ClientSize = New-Object System.Drawing.Point(500,200)
-$Main_Form.FormBorderStyle = "FixedDialog" #FixedDialog, Fixed3D
-$Main_Form.MaximizeBox = $false
-$Main_Form.Font = New-Object System.Drawing.Font("Calibri",10)
-$Main_Form.StartPosition = [Windows.Forms.FormStartPosition]::CenterScreen
-$Main_Form.Add_FormClosing({
-    $Main_Form.Dispose()
-})
-$Main_Form.Add_Load({
-    $Main_Form.TopLevel = $true
-    $Main_Form.Add_Shown({ $this.Activate() })
-    # Check file directory
-    #Write-Host "Checking for App Directory"
-    $appDirPath = "$env:USERPROFILE\Documents"
-    if (-not (Test-path $appDirPath\$Global:AppName)){
-        #Write-Host "    Creating App Directory" -ForegroundColor Yellow
-        New-item -ItemType Directory -Name $AppName -Path $appDirPath -Confirm:$false -Force | Out-Null
-        New-Item -ItemType Directory -Name logs -Path $appDirPath\$AppName -Confirm:$false -Force | Out-Null
-        # Test
-        #Write-Host "Testing App Directory"
-        if (Test-Path $appDirPath\$AppName){
-            # Verify Directory
-            #Write-Host "    App Directory: Verified" -ForegroundColor Yellow
-            # Test
-            #Write-Host "Testing log directory"
-            if (Test-Path "$appDirPath\$AppName\logs"){
-                #Write-Host "    Logs Directory: Verified"
-            }else{
-                [System.Windows.Forms.MessageBox]::Show("Failed to verify logs directory. EL11.", "Error - Local Log", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-                $error = "Error - Local Log : Failed to verify logs directory. EL11."
-                UtilErr $error
-            }
-        }else{
-            [System.Windows.Forms.MessageBox]::Show("Failed to verify logs directory. EL12", "Error - Local Log", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-            $error = "Error - Local Log : Failed to verify logs directory. EL12."
-            UtilErr $error
-        }
-    }else{
-        #Write-Host "    App Directory: Verified" -ForegroundColor Yellow
-        if (-not (Test-Path "$appDirPath\$AppName\logs")){
-            #Write-Host "    Creating Log Directory" -ForegroundColor Yellow
+    $Main_Form = New-Object $Form_Object
+    $Main_Form.Text = "$AppName : $AppVer"
+    $Main_Form.ClientSize = New-Object System.Drawing.Point(500,200)
+    $Main_Form.FormBorderStyle = "FixedDialog" #FixedDialog, Fixed3D
+    $Main_Form.MaximizeBox = $false
+    $Main_Form.Font = New-Object System.Drawing.Font("Calibri",10)
+    $Main_Form.StartPosition = [Windows.Forms.FormStartPosition]::CenterScreen
+    $Main_Form.Add_FormClosing({
+        $Main_Form.Dispose()
+    })
+    $Main_Form.Add_Load({
+        $Main_Form.TopLevel = $true
+        $Main_Form.Add_Shown({ $this.Activate() })
+        # Check file directory
+        #Write-Host "Checking for App Directory"
+        $appDirPath = "$env:USERPROFILE\Documents"
+        if (-not (Test-path $appDirPath\$Global:AppName)){
+            #Write-Host "    Creating App Directory" -ForegroundColor Yellow
+            New-item -ItemType Directory -Name $AppName -Path $appDirPath -Confirm:$false -Force | Out-Null
             New-Item -ItemType Directory -Name logs -Path $appDirPath\$AppName -Confirm:$false -Force | Out-Null
             # Test
-            #Write-Host "Testing Log Directory"
-            if (Test-Path "$appDirPath\$AppName\logs"){
-                #Write-Host "    Log Directory: Verified"
+            #Write-Host "Testing App Directory"
+            if (Test-Path $appDirPath\$AppName){
+                # Verify Directory
+                #Write-Host "    App Directory: Verified" -ForegroundColor Yellow
+                # Test
+                #Write-Host "Testing log directory"
+                if (Test-Path "$appDirPath\$AppName\logs"){
+                    #Write-Host "    Logs Directory: Verified"
+                }else{
+                    [System.Windows.Forms.MessageBox]::Show("Failed to verify logs directory. EL11.", "Error - Local Log", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+                    $error = "Error - Local Log : Failed to verify logs directory. EL11."
+                    UtilErr $error
+                }
             }else{
-                [System.Windows.Forms.MessageBox]::Show("Failed to verify logs directory . EL13.", "Error - Local Log", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-                $error = "Error - Local Log : Failed to verify logs directory. EL13."
+                [System.Windows.Forms.MessageBox]::Show("Failed to verify logs directory. EL12", "Error - Local Log", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+                $error = "Error - Local Log : Failed to verify logs directory. EL12."
                 UtilErr $error
             }
         }else{
-            #Write-Host "    Log Directory: Verified" -ForegroundColor Yellow
+            #Write-Host "    App Directory: Verified" -ForegroundColor Yellow
+            if (-not (Test-Path "$appDirPath\$AppName\logs")){
+                #Write-Host "    Creating Log Directory" -ForegroundColor Yellow
+                New-Item -ItemType Directory -Name logs -Path $appDirPath\$AppName -Confirm:$false -Force | Out-Null
+                # Test
+                #Write-Host "Testing Log Directory"
+                if (Test-Path "$appDirPath\$AppName\logs"){
+                    #Write-Host "    Log Directory: Verified"
+                }else{
+                    [System.Windows.Forms.MessageBox]::Show("Failed to verify logs directory . EL13.", "Error - Local Log", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+                    $error = "Error - Local Log : Failed to verify logs directory. EL13."
+                    UtilErr $error
+                }
+            }else{
+                #Write-Host "    Log Directory: Verified" -ForegroundColor Yellow
+            }
         }
-    }
-})
+    })
 
-$RunAction_Label = New-Object $Label_Object
-$RunAction_Label.Text = "Action Probe"
-$RunAction_Label.Autosize = $true
-$RunAction_Label.Font = New-Object System.Drawing.Font("Calibri",10)
-$RunAction_Label.Location = New-Object System.Drawing.Point(25,50)
-$RunAction_Label.TextAlign = "MiddleCenter"
+    $RunAction_Label = New-Object $Label_Object
+    $RunAction_Label.Text = "Action Probe"
+    $RunAction_Label.Autosize = $true
+    $RunAction_Label.Font = New-Object System.Drawing.Font("Calibri",10)
+    $RunAction_Label.Location = New-Object System.Drawing.Point(25,50)
+    $RunAction_Label.TextAlign = "MiddleCenter"
 
-$RunTargetFile_Label = New-Object $Label_Object
-$RunTargetFile_Label.Text = "Target File"
-$RunTargetFile_Label.Autosize = $true
-$RunAction_Label.Font = New-Object System.Drawing.Font("Calibri",10)
-$RunTargetFile_Label.Location = New-Object System.Drawing.Point(25,100)
-$RunTargetFile_Label.TextAlign = "MiddleCenter"
+    $RunTargetFile_Label = New-Object $Label_Object
+    $RunTargetFile_Label.Text = "Target File"
+    $RunTargetFile_Label.Autosize = $true
+    $RunAction_Label.Font = New-Object System.Drawing.Font("Calibri",10)
+    $RunTargetFile_Label.Location = New-Object System.Drawing.Point(25,100)
+    $RunTargetFile_Label.TextAlign = "MiddleCenter"
 
-$ActionSelectFile_Textbox = New-Object $Textbox_Object
-$ActionSelectFile_Textbox.Size = New-Object System.Drawing.Point(250,75)
-$ActionSelectFile_Textbox.Font = New-Object System.Drawing.Font("Calibri",12,[System.Drawing.FontStyle]::Bold)
-$ActionSelectFile_Textbox.Location = New-Object System.Drawing.Point(150,50)
-$ActionSelectFile_Textbox.ReadOnly = $true
-$ActionSelectFile_Textbox.Enabled = $false
-$ActionSelectFile_Textbox.BackColor = [System.Drawing.Color]::LightSkyBlue
-$ActionSelectFile_Textbox.ForeColor = [System.Drawing.Color]::Black
-$ActionSelectFile_Textbox.Add_TextChanged({
-    $ActionPath = $ActionSelectFile_Textbox.Text
-    if (-not ([string]::IsNullOrEmpty($ActionPath)) -or -not([string]::IsNullOrWhiteSpace($ActionPath))){
-        $EditMenu_EditAction.Enabled = $true
-    }else{
-        $EditMenu_EditAction.Enabled = $false
-    }
-})
+    $ActionSelectFile_Textbox = New-Object $Textbox_Object
+    $ActionSelectFile_Textbox.Size = New-Object System.Drawing.Point(250,75)
+    $ActionSelectFile_Textbox.Font = New-Object System.Drawing.Font("Calibri",12,[System.Drawing.FontStyle]::Bold)
+    $ActionSelectFile_Textbox.Location = New-Object System.Drawing.Point(150,50)
+    $ActionSelectFile_Textbox.ReadOnly = $true
+    $ActionSelectFile_Textbox.Enabled = $false
+    $ActionSelectFile_Textbox.BackColor = [System.Drawing.Color]::LightSkyBlue
+    $ActionSelectFile_Textbox.ForeColor = [System.Drawing.Color]::Black
+    $ActionSelectFile_Textbox.Add_TextChanged({
+        $ActionPath = $ActionSelectFile_Textbox.Text
+        if (-not ([string]::IsNullOrEmpty($ActionPath)) -or -not([string]::IsNullOrWhiteSpace($ActionPath))){
+            $EditMenu_EditAction.Enabled = $true
+        }else{
+            $EditMenu_EditAction.Enabled = $false
+        }
+    })
 
-$TargetSelectFile_TextBox = New-Object $Textbox_Object
-$TargetSelectFile_TextBox.Size = New-Object System.Drawing.Point(250,75)
-$TargetSelectFile_TextBox.Font = New-Object System.Drawing.Font("Calibri",12,[System.Drawing.FontStyle]::Bold)
-$TargetSelectFile_TextBox.Location = New-Object System.Drawing.Point(150,100)
-$TargetSelectFile_TextBox.ReadOnly = $true
-$TargetSelectFile_TextBox.Enabled = $false
-$TargetSelectFile_TextBox.BackColor = [System.Drawing.Color]::LightSkyBlue
-$TargetSelectFile_TextBox.ForeColor = [System.Drawing.Color]::Black
-$TargetSelectFile_TextBox.Add_TextChanged({
-    $TargetPath = $TargetSelectFile_TextBox.Text
-    if (-not ([string]::IsNullOrEmpty($TargetPath)) -or -not([string]::IsNullOrWhiteSpace($TargetPath))){
-        $EditMenu_EditTarget.Enabled = $true
-    }else{
-        $EditMenu_EditTarget.Enabled = $false
-    }
-})
+    $TargetSelectFile_TextBox = New-Object $Textbox_Object
+    $TargetSelectFile_TextBox.Size = New-Object System.Drawing.Point(250,75)
+    $TargetSelectFile_TextBox.Font = New-Object System.Drawing.Font("Calibri",12,[System.Drawing.FontStyle]::Bold)
+    $TargetSelectFile_TextBox.Location = New-Object System.Drawing.Point(150,100)
+    $TargetSelectFile_TextBox.ReadOnly = $true
+    $TargetSelectFile_TextBox.Enabled = $false
+    $TargetSelectFile_TextBox.BackColor = [System.Drawing.Color]::LightSkyBlue
+    $TargetSelectFile_TextBox.ForeColor = [System.Drawing.Color]::Black
+    $TargetSelectFile_TextBox.Add_TextChanged({
+        $TargetPath = $TargetSelectFile_TextBox.Text
+        if (-not ([string]::IsNullOrEmpty($TargetPath)) -or -not([string]::IsNullOrWhiteSpace($TargetPath))){
+            $EditMenu_EditTarget.Enabled = $true
+        }else{
+            $EditMenu_EditTarget.Enabled = $false
+        }
+    })
 
-$ActionSelectFile_Button = New-Object $Button_Object
-$ActionSelectFile_Button.TabIndex = "0"
-$ActionSelectFile_Button.Text = "Select"
-$ActionSelectFile_Button.Width = "75"
-$ActionSelectFile_Button.Height = "30"
-$ActionSelectFile_Button.Font = New-Object System.Drawing.Font("Calibri",10)
-$ActionSelectFile_Button.Location = New-Object System.Drawing.Point(405,50)
-$ActionSelectFile_Button.Add_click({
-    $ActionFile_Browser = New-Object $FileSelect_Object
-    $ActionPath = $ActionSelectFile_Textbox.Text
-    if (-not [string]::IsNullOrEmpty($ActionPath)){
-        if (-not [string]::IsNullOrWhiteSpace($ActionPath)){
-            if ([System.IO.Directory]::Exists($ActionPath)){
-                $ActionFile_Browser.InitialDirectory = $ActionPath
+    $ActionSelectFile_Button = New-Object $Button_Object
+    $ActionSelectFile_Button.TabIndex = "0"
+    $ActionSelectFile_Button.Text = "Select"
+    $ActionSelectFile_Button.Width = "75"
+    $ActionSelectFile_Button.Height = "30"
+    $ActionSelectFile_Button.Font = New-Object System.Drawing.Font("Calibri",10)
+    $ActionSelectFile_Button.Location = New-Object System.Drawing.Point(405,50)
+    $ActionSelectFile_Button.Add_click({
+        $ActionFile_Browser = New-Object $FileSelect_Object
+        $ActionPath = $ActionSelectFile_Textbox.Text
+        if (-not [string]::IsNullOrEmpty($ActionPath)){
+            if (-not [string]::IsNullOrWhiteSpace($ActionPath)){
+                if ([System.IO.Directory]::Exists($ActionPath)){
+                    $ActionFile_Browser.InitialDirectory = $ActionPath
+                }else{
+                    $ActionFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
+                }
             }else{
                 $ActionFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
             }
         }else{
             $ActionFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
         }
-    }else{
-        $ActionFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
-    }
-    #$ActionFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
-    $ActionFile_Browser.Filter = 'Windows PowerShell Script (*.ps1)|*.ps1|Windows Batch File (*.bat)|*.bat|Windows Command Script (*.cmd)|*.cmd'
+        #$ActionFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
+        $ActionFile_Browser.Filter = 'Windows PowerShell Script (*.ps1)|*.ps1|Windows Batch File (*.bat)|*.bat|Windows Command Script (*.cmd)|*.cmd'
     
-    $ActionFile_Browser.ShowDialog() | Out-Null
-    $fileName = $ActionFile_Browser.SafeFileName
-    $filePath = $ActionFile_Browser.FileName
-    if (-not ($fileName -eq "")){
-        $fileDir = Split-Path $ActionFile_Browser.FileName
-    }else{
-        $fileDir = ""
-    }
-
-    if ($ActionFile_Browser.CheckFileExists){
-        if ($fileDir -eq "$env:USERPROFILE\Documents\$AppName" -or $fileDir -eq ""){
-            $ActionSelectFile_Textbox.Text = $filePath
+        $ActionFile_Browser.ShowDialog() | Out-Null
+        $fileName = $ActionFile_Browser.SafeFileName
+        $filePath = $ActionFile_Browser.FileName
+        if (-not ($fileName -eq "")){
+            $fileDir = Split-Path $ActionFile_Browser.FileName
         }else{
-            [System.Windows.Forms.MessageBox]::Show("Can only use and edit files within the local App Directory.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
-            $TargetSelectFile_TextBox.Text = "$env:USERPROFILE\Documents\$AppName" 
-        } 
-    }else{
-        [System.Windows.Forms.MessageBox]::Show("Failed selecting Action path. Not a valid file path.", "Error - Action File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-        $error = "Error - Action File Select : Failed selecting Action path. Not a valid file path."
-        UtilErr $error
-    }
-    $ActionSelectFile_Textbox.SelectionStart = $ActionSelectFile_Textbox.Text.Length
-    #$ActionSelectFile_Textbox.ScrollToCaret()
+            $fileDir = ""
+        }
 
-})
+        if ($ActionFile_Browser.CheckFileExists){
+            if ($fileDir -eq "$env:USERPROFILE\Documents\$AppName" -or $fileDir -eq ""){
+                $ActionSelectFile_Textbox.Text = $filePath
+            }else{
+                [System.Windows.Forms.MessageBox]::Show("Can only use and edit files within the local App Directory.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
+                $TargetSelectFile_TextBox.Text = "$env:USERPROFILE\Documents\$AppName" 
+            } 
+        }else{
+            [System.Windows.Forms.MessageBox]::Show("Failed selecting Action path. Not a valid file path.", "Error - Action File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            $error = "Error - Action File Select : Failed selecting Action path. Not a valid file path."
+            UtilErr $error
+        }
+        $ActionSelectFile_Textbox.SelectionStart = $ActionSelectFile_Textbox.Text.Length
+        #$ActionSelectFile_Textbox.ScrollToCaret()
 
-$TargetSelectFile_Button = New-Object $Button_Object
-$TargetSelectFile_Button.TabIndex = "1"
-$TargetSelectFile_Button.Text = "Select"
-$TargetSelectFile_Button.Width = "75"
-$TargetSelectFile_Button.Height = "30"
-$TargetSelectFile_Button.Font = New-Object System.Drawing.Font("Calibri",10)
-$TargetSelectFile_Button.Location = New-Object System.Drawing.Point(405,100)
-$TargetSelectFile_Button.Add_Click({
-    $TargetFile_Browser = New-Object $FileSelect_Object
-    $TargetPath = $TargetSelectFile_TextBox.Text
-    if (-not [string]::IsNullOrEmpty($TargetPath)){
-        if (-not [string]::IsNullOrWhiteSpace($TargetPath)){
-            if ([System.IO.Directory]::Exists($TargetPath)){
-                $TargetFile_Browser.InitialDirectory = $TargetPath
+    })
+
+    $TargetSelectFile_Button = New-Object $Button_Object
+    $TargetSelectFile_Button.TabIndex = "1"
+    $TargetSelectFile_Button.Text = "Select"
+    $TargetSelectFile_Button.Width = "75"
+    $TargetSelectFile_Button.Height = "30"
+    $TargetSelectFile_Button.Font = New-Object System.Drawing.Font("Calibri",10)
+    $TargetSelectFile_Button.Location = New-Object System.Drawing.Point(405,100)
+    $TargetSelectFile_Button.Add_Click({
+        $TargetFile_Browser = New-Object $FileSelect_Object
+        $TargetPath = $TargetSelectFile_TextBox.Text
+        if (-not [string]::IsNullOrEmpty($TargetPath)){
+            if (-not [string]::IsNullOrWhiteSpace($TargetPath)){
+                if ([System.IO.Directory]::Exists($TargetPath)){
+                    $TargetFile_Browser.InitialDirectory = $TargetPath
+                }else{
+                    $TargetFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
+                }
             }else{
                 $TargetFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
             }
         }else{
             $TargetFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
         }
-    }else{
-        $TargetFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
-    }
-    #$TargetFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
-    $TargetFile_Browser.Filter = 'Text Document (*.txt)|*.txt'
+        #$TargetFile_Browser.InitialDirectory = "$env:USERPROFILE\Documents\$AppName"
+        $TargetFile_Browser.Filter = 'Text Document (*.txt)|*.txt'
 
-    $TargetFile_Browser.ShowDialog() | Out-Null
-    $fileName = $TargetFile_Browser.SafeFileName
-    $filePath = $TargetFile_Browser.FileName
-    if (-not ($fileName -eq "")){
-        $fileDir = Split-Path $TargetFile_Browser.FileName
-    }else{
-        $fileDir = ""
-    }
-
-    if ($TargetFile_Browser.CheckFileExists){
-        if ($fileDir -eq "$env:USERPROFILE\Documents\$AppName" -or $fileDir -eq ""){
-            $TargetSelectFile_TextBox.Text = $filePath
+        $TargetFile_Browser.ShowDialog() | Out-Null
+        $fileName = $TargetFile_Browser.SafeFileName
+        $filePath = $TargetFile_Browser.FileName
+        if (-not ($fileName -eq "")){
+            $fileDir = Split-Path $TargetFile_Browser.FileName
         }else{
-            [System.Windows.Forms.MessageBox]::Show("Can only use and edit files within the local App Directory.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
-            $TargetSelectFile_TextBox.Text = "$env:USERPROFILE\Documents\$AppName" 
+            $fileDir = ""
         }
-    }else{
-        [System.Windows.Forms.MessageBox]::Show("Failed selecting Target path. Not a valid file path.", "Error - Target File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-        $error = "Error - Target File Select : Failed selecting Target path. Not a valid file path."
-        UtilErr $error
-    }
-    $TargetSelectFile_TextBox.SelectionStart = $TargetSelectFile_TextBox.Text.Length
-    #$TargetSelectFile_TextBox.ScrollToCaret()
-})
 
-$TargetFormat_Label = New-Object $Label_Object
-$TargetFormat_Label.Text = "Format : COMPUTER;USER;GROUP"
-$TargetFormat_Label.AutoSize = $true
-$TargetFormat_Label.Font = New-Object System.Drawing.Font("Arial",9)
-$TargetFormat_Label.Location = New-Object System.Drawing.Point(175,130)
-
-$ProcessPrbe_Button = New-Object $Button_Object
-$ProcessPrbe_Button.TabIndex = "2"
-$ProcessPrbe_Button.Text = "==>==>>"
-$ProcessPrbe_Button.width = "100"
-$ProcessPrbe_Button.TextAlign = "MiddleCenter"
-$ProcessPrbe_Button.Location = New-Object System.Drawing.Point(200,155)
-$ProcessPrbe_Button.Add_click({
-    GetShortDate
-    $LocalLog = "$env:USERPROFILE\Documents\$AppName\logs\$ShortDate.log"
-
-    $ActionPath = $ActionSelectFile_Textbox.Text
-    $TargetPath = $TargetSelectFile_TextBox.Text
-    if ((-not [string]::IsNullOrEmpty($ActionPath)) -and (-not [string]::IsNullOrEmpty($TargetPath))){
-        if ((-not [string]::IsNullOrWhiteSpace($ActionPath)) -and (-not [string]::IsNullOrWhiteSpace($TargetPath))){
-            if (([System.IO.File]::Exists($ActionPath)) -and ([System.IO.File]::Exists($TargetPath))){
-                $ActionExtType = [System.IO.Path]::GetExtension($ActionPath)
-                if ($ActionExtType -eq ".ps1"){
-                    $ActionType = "powershell.exe"
-                }elseif ($ActionExtType -eq ".bat" -or $ActionExtType -eq ".cmd"){
-                    $ActionType = "cmd.exe"
-                }
-
-                Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList "$env:USERPROFILE\$AppName\$AppVer\PingIt.ps1",$ActionPath,$TargetPath
-                
+        if ($TargetFile_Browser.CheckFileExists){
+            if ($fileDir -eq "$env:USERPROFILE\Documents\$AppName" -or $fileDir -eq ""){
+                $TargetSelectFile_TextBox.Text = $filePath
             }else{
-                [System.Windows.Forms.MessageBox]::Show("Failed to Run. Action or Target not valid file path.", "Error - Failed", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-                $error = "Error - Failed : Failed to Run. Action or Target not valid file path."
-                UtilErr $error
+                [System.Windows.Forms.MessageBox]::Show("Can only use and edit files within the local App Directory.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
+                $TargetSelectFile_TextBox.Text = "$env:USERPROFILE\Documents\$AppName" 
             }
+        }else{
+            [System.Windows.Forms.MessageBox]::Show("Failed selecting Target path. Not a valid file path.", "Error - Target File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            $error = "Error - Target File Select : Failed selecting Target path. Not a valid file path."
+            UtilErr $error
         }
-    }else{
-        [System.Windows.Forms.MessageBox]::Show("Failed to Run. Missing Action or Target file.", "Error - Missing File Path", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-        $error = "Error - Missing File Path : Failed to Run. Missing Action or Target file."
-        UtilErr $error
-    }
-})
+        $TargetSelectFile_TextBox.SelectionStart = $TargetSelectFile_TextBox.Text.Length
+        #$TargetSelectFile_TextBox.ScrollToCaret()
+    })
+
+    $TargetFormat_Label = New-Object $Label_Object
+    $TargetFormat_Label.Text = "Format : COMPUTER;USER;GROUP"
+    $TargetFormat_Label.AutoSize = $true
+    $TargetFormat_Label.Font = New-Object System.Drawing.Font("Arial",9)
+    $TargetFormat_Label.Location = New-Object System.Drawing.Point(175,130)
+
+    $ProcessPrbe_Button = New-Object $Button_Object
+    $ProcessPrbe_Button.TabIndex = "2"
+    $ProcessPrbe_Button.Text = "==>==>>"
+    $ProcessPrbe_Button.width = "100"
+    $ProcessPrbe_Button.TextAlign = "MiddleCenter"
+    $ProcessPrbe_Button.Location = New-Object System.Drawing.Point(200,155)
+    $ProcessPrbe_Button.Add_click({
+        GetShortDate
+        $LocalLog = "$env:USERPROFILE\Documents\$AppName\logs\$ShortDate.log"
+
+        $ActionPath = $ActionSelectFile_Textbox.Text
+        $TargetPath = $TargetSelectFile_TextBox.Text
+        if ((-not [string]::IsNullOrEmpty($ActionPath)) -and (-not [string]::IsNullOrEmpty($TargetPath))){
+            if ((-not [string]::IsNullOrWhiteSpace($ActionPath)) -and (-not [string]::IsNullOrWhiteSpace($TargetPath))){
+                if (([System.IO.File]::Exists($ActionPath)) -and ([System.IO.File]::Exists($TargetPath))){
+                    $ActionExtType = [System.IO.Path]::GetExtension($ActionPath)
+                    if ($ActionExtType -eq ".ps1"){
+                        $ActionType = "powershell.exe"
+                    }elseif ($ActionExtType -eq ".bat" -or $ActionExtType -eq ".cmd"){
+                        $ActionType = "cmd.exe"
+                    }
+
+                    Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList "$env:USERPROFILE\$AppName\$AppVer\PingIt.ps1",$ActionPath,$TargetPath
+                
+                }else{
+                    [System.Windows.Forms.MessageBox]::Show("Failed to Run. Action or Target not valid file path.", "Error - Failed", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+                    $error = "Error - Failed : Failed to Run. Action or Target not valid file path."
+                    UtilErr $error
+                }
+            }
+        }else{
+            [System.Windows.Forms.MessageBox]::Show("Failed to Run. Missing Action or Target file.", "Error - Missing File Path", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            $error = "Error - Missing File Path : Failed to Run. Missing Action or Target file."
+            UtilErr $error
+        }
+    })
 
 # Create Toolbar Menu
 ##############################################
 
-$Toolbar_Menu = New-Object $ToolbarMenuStrip_Object
-$Toolbar_Menu.BackColor = "#E5E4E2"
-$Toolbar_Menu.Font = New-Object System.Drawing.Font("Arial",10)
+# Main Toolbar
+    $Toolbar_Menu = New-Object $ToolbarMenuStrip_Object
+    $Toolbar_Menu.BackColor = "#E5E4E2"
+    $Toolbar_Menu.Font = New-Object System.Drawing.Font("Arial",10)
 # EDIT Menu
-$ToolbarEdit_Menu = New-Object System.Windows.Forms.ToolStripMenuItem("Edit")
-$ToolbarEdit_Menu.Enabled = $true
+    $ToolbarEdit_Menu = New-Object System.Windows.Forms.ToolStripMenuItem("Edit")
+    $ToolbarEdit_Menu.Enabled = $true
 # Clear Menu
-$ToolbarCLear_Menu = New-Object System.Windows.Forms.ToolStripMenuItem("Clear")
-$ToolbarCLear_Menu.Enabled = $true
-$ToolbarCLear_Menu.Add_Click({
-    $ActionPath = $ActionSelectFile_Textbox.Text
-    $TargetPath = $TargetSelectFile_TextBox.Text
-    if ($ActionPath -eq "" -and $TargetPath -eq ""){
-        if (([string]::IsNullOrEmpty($ActionPath)) -and ([string]::IsNullOrEmpty($TargetPath))){
-            if (([string]::IsNullOrWhiteSpace($ActionPath))-and ([string]::IsNullOrWhiteSpace($TargetPath))){
-                [System.Windows.Forms.MessageBox]::Show("Clear Invalid", "Info - Cannot Clear", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+    $ToolbarCLear_Menu = New-Object System.Windows.Forms.ToolStripMenuItem("Clear")
+    $ToolbarCLear_Menu.Enabled = $true
+    $ToolbarCLear_Menu.Add_Click({
+        $ActionPath = $ActionSelectFile_Textbox.Text
+        $TargetPath = $TargetSelectFile_TextBox.Text
+        if ($ActionPath -eq "" -and $TargetPath -eq ""){
+            if (([string]::IsNullOrEmpty($ActionPath)) -and ([string]::IsNullOrEmpty($TargetPath))){
+                if (([string]::IsNullOrWhiteSpace($ActionPath))-and ([string]::IsNullOrWhiteSpace($TargetPath))){
+                    [System.Windows.Forms.MessageBox]::Show("Clear Invalid", "Info - Cannot Clear", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+                }else{
+                    $ActionSelectFile_Textbox.Text = $null
+                    $TargetSelectFile_TextBox.Text = $null
+                }
             }else{
                 $ActionSelectFile_Textbox.Text = $null
                 $TargetSelectFile_TextBox.Text = $null
@@ -629,11 +634,48 @@ $ToolbarCLear_Menu.Add_Click({
             $ActionSelectFile_Textbox.Text = $null
             $TargetSelectFile_TextBox.Text = $null
         }
-    }else{
-        $ActionSelectFile_Textbox.Text = $null
-        $TargetSelectFile_TextBox.Text = $null
-    }
-})
+    })
+
+# Add Menu
+    $ToolbarAdd_Menu = New-Object System.Windows.Forms.ToolStripMenuItem("Add")
+    $ToolbarAdd_Menu.Enabled = $true
+    $ToolbarAdd_Menu.Add_Click({
+        $AddFile_Browser = New-Object $FileSelect_Object
+        $AddFileDestinationPath = "$env:USERPROFILE\Documents\$AppName"
+        $AddFile_Browser.InitialDirectory = $AddFileDestinationPath
+        $AddFile_Browser.Filter = 'Text Document (*.txt)|*.txt'
+
+        $AddFile_Browser.ShowDialog() | Out-Null
+        $fileName = $AddFile_Browser.SafeFileName
+        $filePath = $AddFile_Browser.FileName
+        if (-not ($fileName -eq "")){
+            $fileDir = Split-Path $AddFile_Browser.FileName
+        }else{
+            $fileDir = ""
+        }
+
+        if ($AddFile_Browser.CheckFileExists){
+            if ($fileDir -eq ""){
+                [System.Windows.Forms.MessageBox]::Show("No File Selected.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
+            }elseif ($fileDir -eq "$AddFileDestinationPath"){
+                # Copy File Ove
+                [System.Windows.Forms.MessageBox]::Show("File already exists in directory. Canceled adding file to avoid a duplicate", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            }else{
+                # Copy File
+                Copy-Item -Path $filePath -Destination "$AddFileDestinationPath\$fileName" -Confirm:$false -Force -ErrorAction SilentlyContinue | Out-Null
+            }
+        }else{
+            [System.Windows.Forms.MessageBox]::Show("Failed verifying the file exists. Not a valid File.", "Error - Add File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+        }
+
+        # Test if Copy was succes
+        if (-not ([System.IO.File]::Exists("$AddFileDestinationPath\$fileName"))){
+            [System.Windows.Forms.MessageBox]::Show("Failed verifying the file exists. Add file was unsuccessful.", "Error - Add File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+        }else{
+            [System.Windows.Forms.MessageBox]::Show("Successfully added $fileName.", "File Added", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::None)
+        }
+    })
+
 
 # Edit Menu
     $EditMenu_EditAction = New-Object System.Windows.Forms.ToolStripMenuItem("Edit Action")
@@ -664,7 +706,7 @@ $ToolbarCLear_Menu.Add_Click({
 
     $ToolbarEdit_Menu.DropDownItems.AddRange(@($EditMenu_EditAction,$EditMenu_EditTarget)) | Out-Null
 
-    $Toolbar_Menu.Items.AddRange(@($ToolbarEdit_Menu,$ToolbarCLear_Menu)) | Out-Null
+    $Toolbar_Menu.Items.AddRange(@($ToolbarEdit_Menu,$ToolbarCLear_Menu,$ToolbarAdd_Menu)) | Out-Null
 
 $Copyright_Label = New-Object $Label_Object
 $Copyright_Label.Text = "$Author $Copyright $Global:CpDate"
