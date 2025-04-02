@@ -2,7 +2,7 @@
 #
 #    -----------------------------------------
 #    Application Name : PingIt 1.0 GUI (RiP)
-#    Created by       : Daniel Krysty
+#    Created by       : DK
 #    Date started     : April 2025
 #    Current as of    : April 2025
 #    -----------------------------------------------------------------------------------
@@ -497,7 +497,6 @@ New-Item -ItemType File -Name PingIt.ps1 -Value $fileText -Path "$env:USERPROFIL
             }elseif ($fileDir -eq ""){
                 [System.Windows.Forms.MessageBox]::Show("No File Selected.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
                 $ActionSelectFile_Textbox.Text = $filePath
-
             }else{
                 [System.Windows.Forms.MessageBox]::Show("Can only use and edit files within the local App Directory.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
                 $ActionSelectFile_Textbox.Text = "$env:USERPROFILE\Documents\$AppName"
@@ -548,8 +547,11 @@ New-Item -ItemType File -Name PingIt.ps1 -Value $fileText -Path "$env:USERPROFIL
         }
 
         if ($TargetFile_Browser.CheckFileExists){
-            if ($fileDir -eq "$env:USERPROFILE\Documents\$AppName" -or $fileDir -eq ""){
+            if ($fileDir -eq "$env:USERPROFILE\Documents\$AppName"){
                 $TargetSelectFile_TextBox.Text = $filePath
+            }elseif ($fileDir -eq ""){
+                [System.Windows.Forms.MessageBox]::Show("No File Selected.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
+                $ActionSelectFile_Textbox.Text = $filePath
             }else{
                 [System.Windows.Forms.MessageBox]::Show("Can only use and edit files within the local App Directory.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
                 $TargetSelectFile_TextBox.Text = "$env:USERPROFILE\Documents\$AppName"
@@ -646,8 +648,8 @@ New-Item -ItemType File -Name PingIt.ps1 -Value $fileText -Path "$env:USERPROFIL
     $ToolbarAdd_Menu.Add_Click({
         $AddFile_Browser = New-Object $FileSelect_Object
         $AddFileDestinationPath = "$env:USERPROFILE\Documents\$AppName"
-        $AddFile_Browser.InitialDirectory = $AddFileDestinationPath
-        $AddFile_Browser.Filter = 'Text Document (*.txt)|*.txt'
+        $AddFile_Browser.InitialDirectory = $env:USERPROFILE
+        $AddFile_Browser.Filter = 'Text Document (*.txt)|*.txt|Windows PowerShell Script (*.ps1)|*.ps1|Windows Batch File (*.bat)|*.bat|Windows Command Script (*.cmd)|*.cmd'
 
         $AddFile_Browser.ShowDialog() | Out-Null
         $fileName = $AddFile_Browser.SafeFileName
