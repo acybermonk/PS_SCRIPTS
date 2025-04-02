@@ -657,22 +657,32 @@ New-Item -ItemType File -Name PingIt.ps1 -Value $fileText -Path "$env:USERPROFIL
         if ($AddFile_Browser.CheckFileExists){
             if ($fileDir -eq ""){
                 [System.Windows.Forms.MessageBox]::Show("No File Selected.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
-            }elseif ($fileDir -eq "$AddFileDestinationPath"){
+            }elseif($fileDir.Contains("$AddFileDestinationPath\logs")){
+                [System.Windows.Forms.MessageBox]::Show("Cannot edit local log files. Canceled adding file", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            }elseif ($fileDir.Contains($AddFileDestinationPath)){
                 # Copy File Ove
                 [System.Windows.Forms.MessageBox]::Show("File already exists in directory. Canceled adding file to avoid a duplicate", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
             }else{
                 # Copy File
                 Copy-Item -Path $filePath -Destination "$AddFileDestinationPath\$fileName" -Confirm:$false -Force -ErrorAction SilentlyContinue | Out-Null
+                # Test if Copy was success
+                if (-not ([System.IO.File]::Exists("$AddFileDestinationPath\$fileName"))){
+                    [System.Windows.Forms.MessageBox]::Show("Failed verifying the file exists. Add file was unsuccessful.", "Error - Add File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+                }else{
+                    [System.Windows.Forms.MessageBox]::Show("Successfully added $fileName.", "File Added", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::None)
+                }
             }
         }else{
-            [System.Windows.Forms.MessageBox]::Show("Failed verifying the file exists. Not a valid File.", "Error - Add File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-        }
-
-        # Test if Copy was succes
-        if (-not ([System.IO.File]::Exists("$AddFileDestinationPath\$fileName"))){
-            [System.Windows.Forms.MessageBox]::Show("Failed verifying the file exists. Add file was unsuccessful.", "Error - Add File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-        }else{
-            [System.Windows.Forms.MessageBox]::Show("Successfully added $fileName.", "File Added", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::None)
+            if ($fileDir -eq ""){
+                [System.Windows.Forms.MessageBox]::Show("No File Selected.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
+            }elseif($fileDir.Contains("$AddFileDestinationPath\logs")){
+                [System.Windows.Forms.MessageBox]::Show("Cannot edit local log files. Canceled adding file", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            }elseif ($fileDir.Contains($AddFileDestinationPath)){
+                # Copy File Ove
+                [System.Windows.Forms.MessageBox]::Show("File already exists in directory. Canceled adding file to avoid a duplicate", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            }else{
+                [System.Windows.Forms.MessageBox]::Show("Failed verifying the file exists. Not a valid File.", "Error - Add File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            }
         }
     })
 
