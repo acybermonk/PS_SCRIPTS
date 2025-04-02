@@ -492,11 +492,15 @@ New-Item -ItemType File -Name PingIt.ps1 -Value $fileText -Path "$env:USERPROFIL
         }
 
         if ($ActionFile_Browser.CheckFileExists){
-            if ($fileDir -eq "$env:USERPROFILE\Documents\$AppName" -or $fileDir -eq ""){
+            if ($fileDir -eq "$env:USERPROFILE\Documents\$AppName"){
                 $ActionSelectFile_Textbox.Text = $filePath
+            }elseif ($fileDir -eq ""){
+                [System.Windows.Forms.MessageBox]::Show("No File Selected.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
+                $ActionSelectFile_Textbox.Text = $filePath
+
             }else{
                 [System.Windows.Forms.MessageBox]::Show("Can only use and edit files within the local App Directory.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
-                $TargetSelectFile_TextBox.Text = "$env:USERPROFILE\Documents\$AppName" 
+                $ActionSelectFile_Textbox.Text = "$env:USERPROFILE\Documents\$AppName"
             } 
         }else{
             [System.Windows.Forms.MessageBox]::Show("Failed selecting Action path. Not a valid file path.", "Error - Action File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
@@ -548,7 +552,7 @@ New-Item -ItemType File -Name PingIt.ps1 -Value $fileText -Path "$env:USERPROFIL
                 $TargetSelectFile_TextBox.Text = $filePath
             }else{
                 [System.Windows.Forms.MessageBox]::Show("Can only use and edit files within the local App Directory.", "Warning", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
-                $TargetSelectFile_TextBox.Text = "$env:USERPROFILE\Documents\$AppName" 
+                $TargetSelectFile_TextBox.Text = "$env:USERPROFILE\Documents\$AppName"
             }
         }else{
             [System.Windows.Forms.MessageBox]::Show("Failed selecting Target path. Not a valid file path.", "Error - Target File Select", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
