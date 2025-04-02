@@ -12,9 +12,9 @@ Invoke-Command -ComputerName $systemName -ScriptBlock {
     $user = $Using:user
     $group = $Using:group
 
-    hostname
-    Write-Host "Connection Successful"
-    Write-Host "---------------------"
+    $SN = $env:COMPUTERNAME
+    Write-Host "Connection Successful ==> $SN"
+    Write-Host "-------------------------------------------"
     Write-Host "Args =" 
     Write-Host "   - System: $systemName"
     Write-Host "   - User  : $user"
