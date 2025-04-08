@@ -75,7 +75,7 @@ $fileText =    '# Ping It
                     $Global:i = 0
                     $Global:c = 0
                     $Global:tryCount = 350 # longer will trigger infinite loop error
-                    $Global:sleep = 300 # 5 minutes
+                    $Global:sleep = 180 # 5 minutes
                     $Global:dataCount = 0
                     [System.Collections.ArrayList]$Global:FileList = @()
                 # Type
@@ -235,10 +235,6 @@ $fileText =    '# Ping It
                             $user = $null
                             $group = $null
                             $pingCheck = $null
-                            $ActionType = $null
-                            $ActionPath = $null
-                            $ActionExtType = $null
-                            $TargetPath = $null
                             $Global:dataCount = 0
                             $minutes = $sleep / 60
                             Write-Host -ForegroundColor Magenta "*PREPARING TO LOOP DATA*"
