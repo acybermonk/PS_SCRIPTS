@@ -280,7 +280,8 @@ Set-StrictMode -Version Latest
 # Create Templates
     # PS ONE FILE (.ps1)
     $psonetemplate_fileText = 
-        '# Input Parameters*
+        '#PSONE TEMPLATE
+        # Input Parameters*
         param(
             [parameter(Mandatory)]
             [string]$systemName,[string]$user,[string]$group
@@ -308,18 +309,38 @@ Set-StrictMode -Version Latest
         Start-Sleep -Seconds 3
         pause'
     New-Item -ItemType File -Name psonetemplate.ps1 -Value $psonetemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
-
     # BAT (.bat)
     $battemplate_fileText = 
-        'REM Bat file here
-        Echo I am a BAT file or I am a bat not sure yet...'
+        'REM BAT TEMPLATE
+        @echo off
+        C:
+        cd %userprofile%\RiP\PsTools
+        REM PSexec cam be called from this location
+
+        echo Initialized by:
+        whoami
+        echo ------------------------------
+
+        set system=%1
+        set user=%2
+        set group=%3'
     New-Item -ItemType File -Name battemplate.bat -Value $battemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
-
     # CMD (.cmd)
-    $cmdtemplate_fileText = 'REM CMD file here
-        Echo I am a CMD file... That is all.'
-    New-Item -ItemType File -Name cmdtemplate.cmd -Value $battemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
+    $cmdtemplate_fileText =
+        'REM CMD file here
+        @echo off
+        C:
+        cd %userprofile%\RiP\PsTools
+        REM PSexec cam be called from this location
 
+        echo Initialized by:
+        whoami
+        echo ------------------------------
+
+        set system=%1
+        set user=%2
+        set group=%3'
+    New-Item -ItemType File -Name cmdtemplate.cmd -Value $battemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
 # Logging
 #--------
 # Running Log
