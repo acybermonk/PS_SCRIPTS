@@ -46,214 +46,279 @@ Set-StrictMode -Version Latest
 # Default File Path
     $Default_FilePath = "$env:USERPROFILE\Documents\RiP"
 # Write PingIt file
-$fileText =    '# Ping It
-                param(
-                    [string]$ActionPath,[string]$TargetPath
-                )
+    $PingIt_fileText = 
+                   '# Ping It
+                    param(
+                        [string]$ActionPath,[string]$TargetPath
+                    )
 
-                # Date
-                #-----
-                # Get date
-                    $Global:Date = Get-Date -DisplayHint Date
-                    function getDate{
+                    # Date
+                    #-----
+                    # Get date
                         $Global:Date = Get-Date -DisplayHint Date
-                    }
-                # Get date abriviation
-                    function GetShortDate{
-                        $Global:ShortDate = Get-Date -Format dd-MM-yyyy_HH-mm-ss
-                    }
-                # Parent App Variables (Updated)
-	                $Global:AppName = "RiP"
-	                $Global:AppVer = "1.0"
-                    $Global:Copyright = [System.Net.WebUtility]::HtmlDecode("&#169;")
-                    $Global:CpDate = "Oct. 2024"
-                    $Global:Author = "DK"
-                # Username
-                    $Global:Username = whoami
-                # Internal Ping Variables
-                    [System.Collections.ArrayList]$Global:found = @()
-                    $Global:i = 0
-                    $Global:c = 0
-                    $Global:tryCount = 350 # longer will trigger infinite loop error
-                    $Global:sleep = 180 # 5 minutes
-                    $Global:dataCount = 0
-                    [System.Collections.ArrayList]$Global:FileList = @()
-                # Type
-                    $ActionExtType = [System.IO.Path]::GetExtension($ActionPath)
-                    if ($ActionExtType -eq ".ps1"){
-                        $ActionType = "powershell.exe"
-                    }elseif ($ActionExtType -eq ".bat" -or $ActionExtType -eq ".cmd"){
-                        $ActionType = "cmd.exe"
-                    }
-                # Local Log
-                    GetShortDate
-                    $LocalLog = "$env:USERPROFILE\Documents\$AppName\logs\$ShortDate.log"
-                # LocalLog write
-                    function localLogWrite{
-                        Param ([string]$logstring)
-                        Add-Content $LocalLog -Value $logstring -Confirm:$false -Force
-                    }
+                        function getDate{
+                            $Global:Date = Get-Date -DisplayHint Date
+                        }
+                    # Get date abriviation
+                        function GetShortDate{
+                            $Global:ShortDate = Get-Date -Format dd-MM-yyyy_HH-mm-ss
+                        }
+                    # Parent App Variables (Updated)
+	                    $Global:AppName = "RiP"
+	                    $Global:AppVer = "1.0"
+                        $Global:Copyright = [System.Net.WebUtility]::HtmlDecode("&#169;")
+                        $Global:CpDate = "Oct. 2024"
+                        $Global:Author = "DK"
+                    # Username
+                        $Global:Username = whoami
+                    # Internal Ping Variables
+                        [System.Collections.ArrayList]$Global:found = @()
+                        $Global:i = 0
+                        $Global:c = 0
+                        $Global:tryCount = 350 # longer will trigger infinite loop error
+                        $Global:sleep = 180 # 3 minutes
+                        $Global:dataCount = 0
+                        [System.Collections.ArrayList]$Global:FileList = @()
+                    # Type
+                        $ActionExtType = [System.IO.Path]::GetExtension($ActionPath)
+                        if ($ActionExtType -eq ".ps1"){
+                            $ActionType = "powershell.exe"
+                        }elseif ($ActionExtType -eq ".bat" -or $ActionExtType -eq ".cmd"){
+                            $ActionType = "cmd.exe"
+                        }
+                    # Local Log
+                        GetShortDate
+                        $LocalLog = "$env:USERPROFILE\Documents\$AppName\logs\$ShortDate.log"
+                    # LocalLog write
+                        function localLogWrite{
+                            Param ([string]$logstring)
+                            Add-Content $LocalLog -Value $logstring -Confirm:$false -Force
+                        }
 
 
-                function displayHeader{
-                    # Write Title
-                    Write-Host -ForegroundColor Magenta "-----------------------------------"
-                    Write-Host -ForegroundColor Magenta "Action Path  : $ActionPath"
-                    Write-Host -ForegroundColor Magenta "Action Type  : $ActionType"
-                    Write-Host -ForegroundColor Magenta "Tartget Path : $TargetPath"
-                    Write-Host -ForegroundColor Magenta "Username     : $username"
-                    Write-Host -ForegroundColor Magenta "-----------------------------------"
-                    Write-Host -ForegroundColor Magenta "Max Attempts : $Global:tryCount"
+                    function displayHeader{
+                        # Write Title
+                        Write-Host -ForegroundColor Magenta "-----------------------------------"
+                        Write-Host -ForegroundColor Magenta "Action Path  : $ActionPath"
+                        Write-Host -ForegroundColor Magenta "Action Type  : $ActionType"
+                        Write-Host -ForegroundColor Magenta "Tartget Path : $TargetPath"
+                        Write-Host -ForegroundColor Magenta "Username     : $username"
+                        Write-Host -ForegroundColor Magenta "-----------------------------------"
+                        Write-Host -ForegroundColor Magenta "Max Attempts : $Global:tryCount"
+                        getDate
+                        localLogWrite "Start : $Global:Date`n$username"
+                        localLogWrite "Max Attempts : $Global:tryCount"
+                    }
+                    displayHeader
                     getDate
-                    localLogWrite "Start : $Global:Date`n$username"
-                    localLogWrite "Max Attempts : $Global:tryCount"
-                }
-                displayHeader
-                getDate
-                localLogWrite "Starting Auto Run : $Global:Date"
-                Write-Host -ForegroundColor Magenta "Starting Auto Run : $Date"
+                    localLogWrite "Starting Auto Run : $Global:Date"
+                    Write-Host -ForegroundColor Magenta "Starting Auto Run : $Date"
 
-                function doIt{
-                    # Get list of items form File
-                    $list = Get-Content $TargetPath
-                    # Put list into an arrayList
-                    foreach ($value in $list){
-                        if ($value -ne ""){
-                            if ((-not ([string]::IsNullOrEmpty($value))) -and (-not ([string]::IsNullOrWhiteSpace($value)))){
-                                $Global:FileList += $value
-                            }
-                        }
-                    }
-
-                    # Check If Completed
-                    if($Global:FileList.Count -gt 0){
-                        $Global:dataCount = $Global:FileList.count
-                    }else{
-                        Write-Host("*COMPLETED ALL DATA*")
-                        localLogWrite "*COMPLETED ALL DATA*"
-                        exit
-                    }
-
-                    # Check if Data list
-
-                    # Format : Computer;User;Group
-                    # Optional Variables:
-                    #    Computer - computer variable to target (*Required)
-                    #    User - user variable to target
-                    #    Group - AD Group;User Group to target 
-
-                    foreach ($data in $Global:FileList){
-                        # Convert Data to strings
-                        $data = $data.ToString()
-                        $dataSplit = $data -split ";"
-                        $length = $dataSplit.Length
-
-                        if ($length -eq 3){
-                            $system = $dataSplit[0]
-                            $user = $dataSplit[1]
-                            $group = $dataSplit[2]
-                        }elseif ($length -eq 2){
-                            $system = $dataSplit[0]
-                            $user = $dataSplit[1]
-                            $group = $null
-                        }elseif ($length -eq 1){
-                            $system = $dataSplit[0]
-                            $user = $null
-                            $group = $null
-                        }
-                        # ping it
-                        $pingCheck = ping $system -n 1
-
-                        if ($pingCheck -like "reply*"){
-                            Write-Host("$system is Online")
-                            # system is online
-                            localLogWrite "$system is Online"
-                            try{
-                                # run cmd command or bat file
-                                # log header
-                                getDate
-                                localLogWrite "Running $ActionType Process : $Date`n$username;System $system;User $user"
-                                localLogWrite "Action Path : $ActionPath"
-
-                                if ($ActionType -eq "powershell.exe"){
-                                    $process = Start-Process -FilePath $ActionType -Verb RunAs -Wait -PassThru -ArgumentList "-File $ActionPath $system $user $group"
-                                }elseif ($ActionType -eq "cmd.exe"){
-                                    $process = Start-Process -Wait -PassThru -FilePath $ActionType -Verb RunAs -ArgumentList "/c $ActionPath $system $user $group"
+                    function doIt{
+                        # Get list of items form File
+                        $list = Get-Content $TargetPath
+                        # Put list into an arrayList
+                        foreach ($value in $list){
+                            if ($value -ne ""){
+                                if ((-not ([string]::IsNullOrEmpty($value))) -and (-not ([string]::IsNullOrWhiteSpace($value)))){
+                                    $Global:FileList += $value
                                 }
-                                #$process = Start-Process -Wait -PassThru -FilePath "cmd" -Verb RunAs -ArgumentList "/c $Path\$Global:ScriptPath $system $user $group"
-                                #$process = Start-Process -Wait -PassThru -FilePath "powershell" -Verb RunAs -ArgumentList "$Path\$Global:ScriptPath",$system,$user,$group
-                    
-                                # process was successful
-                                $processErrCode = $process.ExitCode
-                                Write-Host("  **Process Completed with ErrorCode $processErrCode")
-                                localLogWrite "  **Process Completed with ErrorCode $processErrCode"
-                                $Global:found.Add("$data") | Out-Null
-                            }catch{
-                                # fail to open cmd
-                                Write-Error "  **Process FAILED" 
-                                localLogWrite "  **Process FAILED"
                             }
-                        }elseif ($pingCheck -like "Request timed out."){
-                            Write-Host("$system request timed out")
-                        }elseif ($pingCheck -like "Ping request could not find host*"){
-                            Write-Host("$system is Offline")
-                        }elseif ($pingCheck -like "Destination Host Unreachable*"){
-                            Write-Host("$system is unreachable")
-                        }else {
-                            Write-Host("unkown value error : $system")
-                            Write-Host("PINGCHECK : $pingCheck")
                         }
-                    }
-                    if ($Global:found.Count -ge 1){
-                        Write-Host("_____")
-                        #Write-Output($Global:found)
-                        foreach ($d in $Global:found){
-                            Write-Host("Removing : ${d}")
-                            localLogWrite "Removed ${d}"
-                            $c += 1
-                            $out = Get-Content $TargetPath | Select-String -Pattern $d -notmatch 
-                            Set-Content -Path $TargetPath -Value $out
-                        }
-                        Write-Host("..")
-                        if ($c -ne 0){
-                            Write-Host("Remove Count : ${c}")
-                        }
-                        Write-Host("_____")
-                        localLogWrite "*---------------------------*"
-                    }
-                    $Global:tryCount = $Global:tryCount - 1
-                    Write-Host -ForegroundColor Magenta "Attempts remaining : ${Global:tryCount}"
-                    Write-Host -ForegroundColor Magenta "*---------------------------*"
-                    if ($Global:tryCount -gt 0){
-                        if (($Global:dataCount - $c) -gt 0){
-                            [System.Collections.ArrayList]$Global:found = @()
-                            [System.Collections.ArrayList]$Global:FileList = @()
-                            $c = 0
-                            $data = $null
-                            $dataSplit = $null
-                            $system = $null
-                            $user = $null
-                            $group = $null
-                            $pingCheck = $null
-                            $Global:dataCount = 0
-                            $minutes = $sleep / 60
-                            Write-Host -ForegroundColor Magenta "*PREPARING TO LOOP DATA*"
-                            localLogWrite "*PREPARING TO LOOP DATA*"
-                            Write-Host -ForegroundColor Magenta "Sleeping for ${minutes} minutes. Please wait..."
-                            Start-Sleep -Seconds $sleep
-                            doIt
+
+                        # Check If Completed
+                        if($Global:FileList.Count -gt 0){
+                            $Global:dataCount = $Global:FileList.count
                         }else{
                             Write-Host("*COMPLETED ALL DATA*")
                             localLogWrite "*COMPLETED ALL DATA*"
+                            exit
                         }
-                    }else{
-                        Write-Host("*COMPLETED ALL ATTEMPTS*")
-                        localLogWrite "*COMPLETED ALL ATTEMPTS*"
-                        exit
+
+                        # Check if Data list
+
+                        # Format : Computer;User;Group
+                        # Optional Variables:
+                        #    Computer - computer variable to target (*Required)
+                        #    User - user variable to target
+                        #    Group - AD Group;User Group to target 
+
+                        foreach ($data in $Global:FileList){
+                            # Convert Data to strings
+                            $data = $data.ToString()
+                            $dataSplit = $data -split ";"
+                            $length = $dataSplit.Length
+
+                            if ($length -eq 3){
+                                $system = $dataSplit[0]
+                                $user = $dataSplit[1]
+                                $group = $dataSplit[2]
+                            }elseif ($length -eq 2){
+                                $system = $dataSplit[0]
+                                $user = $dataSplit[1]
+                                $group = $null
+                            }elseif ($length -eq 1){
+                                $system = $dataSplit[0]
+                                $user = $null
+                                $group = $null
+                            }
+                            # ping it
+                            $pingCheck = ping $system -n 1
+
+                            if ($pingCheck -like "reply*"){
+                                Write-Host("$system is Online")
+                                # system is online
+                                localLogWrite "$system is Online"
+                                try{
+                                    # run cmd command or bat file
+                                    # log header
+                                    getDate
+                                    localLogWrite "Running $ActionType Process : $Date`n$username;System $system;User $user"
+                                    localLogWrite "Action Path : $ActionPath"
+
+                                    if ($ActionType -eq "powershell.exe"){
+                                        $process = Start-Process -FilePath $ActionType -Verb RunAs -Wait -PassThru -ArgumentList "-File $ActionPath $system $user $group"
+                                    }elseif ($ActionType -eq "cmd.exe"){
+                                        $process = Start-Process -Wait -PassThru -FilePath $ActionType -Verb RunAs -ArgumentList "/c $ActionPath $system $user $group"
+                                    }
+                                    #$process = Start-Process -Wait -PassThru -FilePath "cmd" -Verb RunAs -ArgumentList "/c $Path\$Global:ScriptPath $system $user $group"
+                                    #$process = Start-Process -Wait -PassThru -FilePath "powershell" -Verb RunAs -ArgumentList "$Path\$Global:ScriptPath",$system,$user,$group
+                    
+                                    # process was successful
+                                    $processErrCode = $process.ExitCode
+                                    Write-Host("  **Process Completed with ErrorCode $processErrCode")
+                                    localLogWrite "  **Process Completed with ErrorCode $processErrCode"
+                                    $Global:found.Add("$data") | Out-Null
+                                }catch{
+                                    # fail to open cmd
+                                    Write-Error "  **Process FAILED" 
+                                    localLogWrite "  **Process FAILED"
+                                }
+                            }elseif ($pingCheck -like "Request timed out."){
+                                Write-Host("$system request timed out")
+                            }elseif ($pingCheck -like "Ping request could not find host*"){
+                                Write-Host("$system is Offline")
+                            }elseif ($pingCheck -like "Destination Host Unreachable*"){
+                                Write-Host("$system is unreachable")
+                            }else {
+                                Write-Host("unkown value error : $system")
+                                Write-Host("PINGCHECK : $pingCheck")
+                            }
+                        }
+                        if ($Global:found.Count -ge 1){
+                            Write-Host("_____")
+                            #Write-Output($Global:found)
+                            foreach ($d in $Global:found){
+                                Write-Host("Removing : ${d}")
+                                localLogWrite "Removed ${d}"
+                                $c += 1
+                                $out = Get-Content $TargetPath | Select-String -Pattern $d -notmatch 
+                                Set-Content -Path $TargetPath -Value $out
+                            }
+                            Write-Host("..")
+                            if ($c -ne 0){
+                                Write-Host("Remove Count : ${c}")
+                            }
+                            Write-Host("_____")
+                            localLogWrite "*---------------------------*"
+                        }
+                        $Global:tryCount = $Global:tryCount - 1
+                        Write-Host -ForegroundColor Magenta "Attempts remaining : ${Global:tryCount}"
+                        Write-Host -ForegroundColor Magenta "*---------------------------*"
+                        if ($Global:tryCount -gt 0){
+                            if (($Global:dataCount - $c) -gt 0){
+                                [System.Collections.ArrayList]$Global:found = @()
+                                [System.Collections.ArrayList]$Global:FileList = @()
+                                $c = 0
+                                $data = $null
+                                $dataSplit = $null
+                                $system = $null
+                                $user = $null
+                                $group = $null
+                                $pingCheck = $null
+                                $Global:dataCount = 0
+                                $minutes = $sleep / 60
+                                Write-Host -ForegroundColor Magenta "*PREPARING TO LOOP DATA*"
+                                localLogWrite "*PREPARING TO LOOP DATA*"
+                                Write-Host -ForegroundColor Magenta "Sleeping for ${minutes} minutes. Please wait..."
+                                Start-Sleep -Seconds $sleep
+                                doIt
+                            }else{
+                                Write-Host("*COMPLETED ALL DATA*")
+                                localLogWrite "*COMPLETED ALL DATA*"
+                            }
+                        }else{
+                            Write-Host("*COMPLETED ALL ATTEMPTS*")
+                            localLogWrite "*COMPLETED ALL ATTEMPTS*"
+                            exit
+                        }
                     }
-                }
-                doIt'
-New-Item -ItemType File -Name PingIt.ps1 -Value $fileText -Path "$env:USERPROFILE\$AppName\$AppVer" -Confirm:$false -Force | Out-Null
+                    doIt' # EOF
+    # Create Fil
+    New-Item -ItemType File -Name PingIt.ps1 -Value $PingIt_fileText -Path "$env:USERPROFILE\$AppName\$AppVer" -Confirm:$false -Force | Out-Null
+# If PSExec does not exist in App directory; install it from url path
+    if (Test-Path "$env:USERPROFILE\$AppName\PSTools\PSExec.exe"){
+        Write-Host "PS tools is already downloaded to location"
+    }else{
+        # Define the URL for PsExec
+        $url = "https://download.sysinternals.com/files/PSTools.zip"
+
+        # Define the destination path
+        $destinationPath = "$env:USERPROFILE\$AppName\PSTools.zip"
+
+        # Download the file
+        Invoke-WebRequest -Uri $url -OutFile $destinationPath
+
+        # Extract the zip file
+        $extractPath = "$env:USERPROFILE\$AppName\PSTools"
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        [System.IO.Compression.ZipFile]::ExtractToDirectory($destinationPath, $extractPath)
+
+        # Optional: Remove the zip file after extraction
+        Remove-Item $destinationPath
+    }
+# Create Templates
+    # PS ONE FILE (.ps1)
+    $psonetemplate_fileText = 
+        '# Input Parameters*
+        param(
+            [parameter(Mandatory)]
+            [string]$systemName,[string]$user,[string]$group
+        )
+        Write-Host "Attepting connect to $systemName" -ForegroundColor Magenta
+        Invoke-Command -ComputerName $systemName -ScriptBlock {
+            # Use passed variables in Invoke-Command request (Using variables are required)
+            $systemName = $Using:systemName
+            $user = $Using:user
+            $group = $Using:group
+
+            Write-Host "$env:COMPUTERNAME Connection Successful" -ForegroundColor Green
+            Write-Host "---------------------"
+            Write-Host "Args =" 
+            Write-Host "   - System: $systemName"
+            Write-Host "   - User  : $user"
+            Write-Host "   - Group : $group"
+
+            # Your Code Here
+            ################
+            ################
+            
+            
+        }
+        Start-Sleep -Seconds 3
+        pause'
+    New-Item -ItemType File -Name psonetemplate.ps1 -Value $psonetemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
+
+    # BAT (.bat)
+    $battemplate_fileText = 
+        'REM Bat file here
+        Echo I am a BAT file or I am a bat not sure yet...'
+    New-Item -ItemType File -Name battemplate.bat -Value $battemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
+
+    # CMD (.cmd)
+    $cmdtemplate_fileText = 'REM CMD file here
+        Echo I am a CMD file... That is all.'
+    New-Item -ItemType File -Name cmdtemplate.cmd -Value $battemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
 
 # Logging
 #--------
