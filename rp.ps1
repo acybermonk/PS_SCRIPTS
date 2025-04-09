@@ -257,9 +257,10 @@ Set-StrictMode -Version Latest
     # Create Fil
     New-Item -ItemType File -Name PingIt.ps1 -Value $PingIt_fileText -Path "$env:USERPROFILE\$AppName\$AppVer" -Confirm:$false -Force | Out-Null
 # If PSExec does not exist in App directory; install it from url path
-    if (Test-Path "$env:USERPROFILE\$AppName\PSTools\PSExec.exe"){
-        Write-Host "PS tools is already downloaded to location"
-    }else{
+    if (-not (Test-Path "$env:USERPROFILE\$AppName\PSTools\PSExec.exe")){
+        if (Test-Path "$env:USERPROFILEq\$AppName\PSTools"){
+            Remove-Item -Path "$env:USERPROFILEq\$AppName\PSTools" -Confirm:$false -Force -Recurse | Out-Null
+        }
         # Define the URL for PsExec
         $url = "https://download.sysinternals.com/files/PSTools.zip"
 
