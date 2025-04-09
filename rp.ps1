@@ -239,7 +239,6 @@ Set-StrictMode -Version Latest
                                 $Global:dataCount = 0
                                 $minutes = $sleep / 60
                                 Write-Host -ForegroundColor Magenta "*PREPARING TO LOOP DATA*"
-                                localLogWrite "*PREPARING TO LOOP DATA*"
                                 Write-Host -ForegroundColor Magenta "Sleeping for ${minutes} minutes. Please wait..."
                                 Start-Sleep -Seconds $sleep
                                 doIt
