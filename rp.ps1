@@ -108,6 +108,9 @@ Set-StrictMode -Version Latest
                         getDate
                         localLogWrite "Start : $Global:Date`n$username"
                         localLogWrite "Max Attempts : $Global:tryCount"
+                        localLogwrite "Action Path  : $ActionPath"
+                        localLogWrite "Tartget Path : $TargetPath"
+
                     }
                     displayHeader
                     getDate
@@ -129,6 +132,7 @@ Set-StrictMode -Version Latest
                         # Check If Completed
                         if($Global:FileList.Count -gt 0){
                             $Global:dataCount = $Global:FileList.count
+                            localLogWrite "Current Data Count : $dataCount"
                         }else{
                             Write-Host("*COMPLETED ALL DATA*")
                             localLogWrite "*COMPLETED ALL DATA*"
