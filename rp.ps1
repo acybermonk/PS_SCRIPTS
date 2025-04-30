@@ -1,3 +1,4 @@
+
 ########################################################################################
 #
 #    -----------------------------------------
@@ -132,7 +133,7 @@ Set-StrictMode -Version Latest
                         # Check If Completed
                         if($Global:FileList.Count -gt 0){
                             $Global:dataCount = $Global:FileList.count
-                            localLogWrite "Current Data Count : $dataCount"
+                            Write-Host "Current Data Count : $dataCount" -Foreground Magenta
                         }else{
                             Write-Host("*COMPLETED ALL DATA*")
                             localLogWrite "*COMPLETED ALL DATA*"
