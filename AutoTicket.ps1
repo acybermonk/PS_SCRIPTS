@@ -130,7 +130,11 @@ if (-not (Test-Path $usersPath)){
         [int]$count = 0
 
         if ($userList -ne $null){
-            $userCount = $userList.Count
+            try{
+                $userCount = $userList.Count
+            }catch{
+                [int]$userCount = 1
+            }
         }else{
             Write-Error -Message "   ***ERR User acount list empty in file"
             if ($techList -eq $null){
@@ -139,7 +143,11 @@ if (-not (Test-Path $usersPath)){
             exit         
         }
         if ($techList -ne $null){
-            $techCount = $techList.Count
+            try{
+                $techCount = $techList.Count
+            }catch{
+                [int]$techCount = 1
+            }
         }else{
             Write-Error -Message "   ***ERR Tech acount list empty in file"
             exit
@@ -163,7 +171,7 @@ if (-not (Test-Path $usersPath)){
             if (-not ($user -eq $null -or $user -eq "" -or $user -eq " ")){
                 # if last tech on list they get added  the remainder of list
                 if ($techIndex -eq ($techCount - 1)){
-                    $tech = $techList[$techIndex]
+                    $tech = $techList
                     $count = $count + 1
                     Write-Host "Assigning Ticket to LAST" $tech -ForegroundColor Yellow
                 }else{
