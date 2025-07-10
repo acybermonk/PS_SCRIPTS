@@ -14,7 +14,7 @@
 
 
 # Log File ad function for logging
-$logFile = .\CreateBulkTicket.log"
+$logFile = ".\CreateBulkTicket.log"
 
 function Log-Message($message) {
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
