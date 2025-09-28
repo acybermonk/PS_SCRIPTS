@@ -1,6 +1,6 @@
 # DK's Cafe
 # Created by Daniel Krysty; Updated November 2024
-$Global:appName = "CoffeShop"
+$Global:appName = "Coffee Shop"
 $Global:appVer = '1.0'
 # Set execution Type
     $ExPol = Get-ExecutionPolicy -Scope CurrentUser
