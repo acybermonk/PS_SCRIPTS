@@ -384,11 +384,11 @@ doIt
 # Your Code Starts Here
 #######################
 
-Write-Host "==Starting script.=="
+Write-Host "--Starting script--"
 
 ##
 #----------------------
-# Your Code Starts Here
+# Your Code Ends Here
 #######################
     } # END Invoke Command
 
@@ -397,11 +397,11 @@ Write-Host "==Starting script.=="
     if ($errVar -ne $null){
         $errVarMessage = "Captured Error: $($errVar[0].Exception.Message)"
         Write-Host $errVarMessage
-        Applogwrite -logstring "START LOG`n"
-        Applogwrite -logstring "PushCode : $systemName;$user;$group"
-        Applogwrite -logstring "Connection Code Err"
-        Applogwrite -logstring $errVarMessage
-        Applogwrite -logstring "END LOG`n"
+        Applogwrite -Applogstring "START LOG`n"
+        Applogwrite -Applogstring "PushCode : $systemName;$user;$group"
+        Applogwrite -Applogstring "Connection Code Err"
+        Applogwrite -Applogstring $errVarMessage
+        Applogwrite -Applogstring "END LOG`n"
     }
 
 # Wait Check
