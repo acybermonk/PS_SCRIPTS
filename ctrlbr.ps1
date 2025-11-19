@@ -345,19 +345,19 @@ doIt
         # Log
         $LocalLogFile = "crtlbr.log"
         $LocalLogRoot = "C:\ProgramData"
-        $Global:LocalTIlogPath = "$LocalLogRoot\TILogs\$LocalLogFile"
+        $Global:LocallogPath = "$LocalLogRoot\CtrlBr\$LocalLogFile"
 
         function Tilogwrite{
             param([parameter(Mandatory)][string]$logstring)
             $LogTime = Get-Date -Format "MM/dd/yyy HH:mm:ss"
-            Add-Content $Global:LocalTIlogPath -Value "[LOGGING]$LogTime --- $logstring"
+            Add-Content $Global:LocallogPath -Value "[LOGGING]$LogTime --- $logstring"
         }
 
         if (Test-Path -Path "\\$systemName\$Global:LocalTIlogPath"){
             Write-Host "Log Exists : Appending Log"
         }else{
             Write-Host "Log Created"
-            Tilogwrite -logstring "Contol Bridge Log"
+            Tilogwrite -logstring "Control Bridge Log"
             Tilogwrite -logstring "----------------------------------`n"
         }
 
