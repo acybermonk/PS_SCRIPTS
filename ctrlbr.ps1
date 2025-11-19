@@ -353,7 +353,7 @@ doIt
             Add-Content $Global:LocalTIlogPath -Value "[LOGGING]$LogTime --- $logstring"
         }
 
-        if (Test-Path -Path "\\$systemName\C$\ProgramData\TILogs\$LocalLogFile"){
+        if (Test-Path -Path "\\$systemName\$Global:LocalTIlogPath"){
             Write-Host "Log Exists : Appending Log"
         }else{
             Write-Host "Log Created"
