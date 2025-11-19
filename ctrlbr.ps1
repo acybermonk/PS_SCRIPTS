@@ -357,8 +357,8 @@ doIt
             Write-Host "Log Exists : Appending Log"
         }else{
             Write-Host "Log Created"
-            Tilogwrite -logstring "Control Bridge Log"
-            Tilogwrite -logstring "----------------------------------`n"
+            Systemlogwrite -logstring "Control Bridge Log"
+            Systemlogwrite -logstring "----------------------------------`n"
         }
 
         # Header and Description of script
