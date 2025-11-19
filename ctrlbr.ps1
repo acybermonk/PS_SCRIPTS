@@ -347,13 +347,13 @@ doIt
         $LocalLogRoot = "C:\ProgramData"
         $Global:LocallogPath = "$LocalLogRoot\CtrlBr\$LocalLogFile"
 
-        function Tilogwrite{
+        function Systemlogwrite{
             param([parameter(Mandatory)][string]$logstring)
             $LogTime = Get-Date -Format "MM/dd/yyy HH:mm:ss"
             Add-Content $Global:LocallogPath -Value "[LOGGING]$LogTime --- $logstring"
         }
 
-        if (Test-Path -Path "\\$systemName\$Global:LocalTIlogPath"){
+        if (Test-Path -Path "\\$systemName\$Global:LocallogPath"){
             Write-Host "Log Exists : Appending Log"
         }else{
             Write-Host "Log Created"
@@ -371,13 +371,13 @@ doIt
         Write-Host "   - RunAs    :   $env:USERNAME`n"
 
         # Log Header
-        Tilogwrite -logstring "$env:COMPUTERNAME Connection Successful"
-        Tilogwrite -logstring "---------------------------------------"
-        Tilogwrite -logstring "Args =" 
-        Tilogwrite -logstring "   - System   :   $systemName"
-        Tilogwrite -logstring "   - User     :   $user"
-        Tilogwrite -logstring "   - Group    :   $group"
-        Tilogwrite -logstring "   - RunAs    :   $env:USERNAME`n"
+        Systemlogwrite -logstring "$env:COMPUTERNAME Connection Successful"
+        Systemlogwrite -logstring "---------------------------------------"
+        Systemlogwrite -logstring "Args =" 
+        Systemlogwrite -logstring "   - System   :   $systemName"
+        Systemlogwrite -logstring "   - User     :   $user"
+        Systemlogwrite -logstring "   - Group    :   $group"
+        Systemlogwrite -logstring "   - RunAs    :   $env:USERNAME`n"
 
 ##
 #----------------------
