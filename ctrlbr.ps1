@@ -2,7 +2,7 @@
 #
 #    -----------------------------------------
 #    Application Name : ControlBridge (ctrlbr.ps1, ctrlbr.exe)
-#    Created by       : DK
+#    Created by       : DK (acybermonk) with log config
 #    Date started     : November 2025
 #    Current as of    : November 2025
 #    -----------------------------------------------------------------------------------
