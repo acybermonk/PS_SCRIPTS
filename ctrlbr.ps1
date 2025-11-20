@@ -3,7 +3,7 @@
 #    -----------------------------------------
 #    Application Name : ControlBridge (ctrlbr.ps1, ctrlbr.exe)
 #    Created by       : DK (acybermonk) with log config
-#    Date started     : November 2025
+#    Date Created     : November 2025
 #    Current as of    : November 2025
 #    -----------------------------------------------------------------------------------
 #    Functionality    : Loop through list of computers or users performing a script
@@ -22,7 +22,7 @@
 Set-StrictMode -Version Latest
 # App Variables (Updated)
 	$Global:AppName = "ControlBridge"
-	$Global:AppVer = "1.11.25"
+	$Global:AppVer = "1.2.1125"
     $Global:Copyright = [System.Net.WebUtility]::HtmlDecode("&#169;")
     #$Global:CpDate = "Nov 2025"
     $Global:Author = "acybermonk"
@@ -263,7 +263,9 @@ Write-Host -ForegroundColor Blue "*---------------------------*"
 doIt
 ' # EOF
     # Create Fil
-    New-Item -ItemType File -Name PingIt.ps1 -Value $PingIt_fileText -Path "$env:USERPROFILE\$AppName\$AppVer" -Confirm:$false -Force | Out-Null
+    if (-not (Test-Path "$env:USERPROFILE\$AppName\$AppVer\PingIt.ps1")){
+        New-Item -ItemType File -Name PingIt.ps1 -Value $PingIt_fileText -Path "$env:USERPROFILE\$AppName\$AppVer" -Confirm:$false -Force | Out-Null
+    }
 # If PSExec does not exist in App directory; install it from url path
     if (-not (Test-Path "$env:USERPROFILE\$AppName\PSTools\PSExec.exe")){
         if (Test-Path "$env:USERPROFILE\$AppName\PSTools"){
@@ -410,7 +412,9 @@ Write-Host "--Starting script--"
     Pause
     Exit
 '
-    New-Item -ItemType File -Name psonetemplate.ps1 -Value $psonetemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
+    if (-not (Test-Path "$env:USERPROFILE\Documents\$AppName\templates\psonetemplate.ps1")){
+        New-Item -ItemType File -Name psonetemplate.ps1 -Value $psonetemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
+    }
     # BAT (.bat)
     $battemplate_fileText = 
 'REM BAT TEMPLATE
@@ -440,7 +444,9 @@ set system=%1
 set user=%2
 set group=%3
 '
-    New-Item -ItemType File -Name battemplate.bat -Value $battemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
+    if (-not (Test-Path "$env:USERPROFILE\Documents\$AppName\templates\battemplate.bat")){
+        New-Item -ItemType File -Name battemplate.bat -Value $battemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
+    }
     # CMD (.cmd)
     $cmdtemplate_fileText =
 'REM CMD file here
@@ -470,7 +476,9 @@ set system=%1
 set user=%2
 set group=%3
 '
-    New-Item -ItemType File -Name cmdtemplate.cmd -Value $battemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
+    if (-not (Test-Path "$env:USERPROFILE\Documents\$AppName\templates\cmdtemplate.cmd")){
+        New-Item -ItemType File -Name cmdtemplate.cmd -Value $battemplate_fileText -Path "$env:USERPROFILE\Documents\$AppName\templates" -Confirm:$false -Force | Out-Null
+    }
 # Logging
 #--------
 # Running Log
