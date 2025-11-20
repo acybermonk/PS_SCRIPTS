@@ -46,8 +46,8 @@ if (!$module_check -ne $null){
     $AppCopyrightDate = ($($AppCopyrightText).Line -split ":" | select -Index 1).Substring(1)
     $AppProduct = "Control Bridge"
 
-    cd "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing"
-
+    $directorySet = [System.IO.Path]::GetDirectoryName($Input_FileBrowser.FileName)
+    Set-Location -Path $directorySet
     Invoke-ps2exe -inputFile "$($Root)\$($InputName)" -outputFile "$($OutputFileName)_$($AppVersion).exe" -iconFile $IconFilePath -title $AppTitle -version $AppVersion -copyright $AppCopyrightDate -product $AppProduct -x64 -requireAdmin -Verbose -noConsole
     
     #Invoke-ps2exe -inputFile "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\ctrlbr.ps1" -outputFile ctrlbr.exe -iconFile "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\iconRP_64.ico" -noConsole -title "Control Bridge Utility" -version "1.11.25.19" -x64 -copyright "November 2025" -product "Control Bridge" -requireAdmin -Verbose
@@ -86,11 +86,3 @@ if (!$module_check -ne $null){
         Exit
     }
 }
-
-# OLD Packages
-###############
-
-#Invoke-ps2exe -inputFile "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\rp.ps1" -outputFile rp.exe -iconFile "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\iconRP_64.ico" -noConsole -title "RiP" -version "1.0" -x64 -copyright "October 2024" -requireAdmin -Verbose
-#Invoke-ps2exe -inputFile "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\coffee.ps1" -outputFile CoffeeShop.exe -iconFile "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\coffee-cup.ico" -noConsole -title "Coffee Shop" -version "1.0" -x64 -copyright "September 2025"
-#Invoke-ps2exe -inputFile "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\coffee.ps1" -outputFile CoffeeShop.exe -iconFile "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\coffee-cup.ico" -noConsole -title "Coffee Shop" -version "1.0" -x64 -copyright "September 2025" -requireAdmin -Verbose
-#Invoke-ps2exe -inputFile "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\coffee.ps1" -outputFile CoffeeShop.exe -iconFile "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\coffee-cup.ico" -noConsole -title "ControlBridge" -version "1.0" -x64 -copyright "September 2025" -requireAdmin -Verbose
