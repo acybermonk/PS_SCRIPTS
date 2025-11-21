@@ -20,8 +20,7 @@ $Global:AppVer = "2.0"
 $Global:CpDate = "November 2025"
 $Global:CpAuthor = "acybermonk"
 
-Write-Host "`n`n--- Welcome to the Executable Creation Tool ---"
-Write-Host "===============================================`n"
+Write-Host "Welcome to the Executable Creation Tool" -ForegroundColor Yellow
 $StartScript = Read-Host -Prompt "Start File Selection? Press 1 to continue."
 if ($StartScript -ne 1){
     Write-Host "Cancelling. Goodbye for now."
@@ -43,78 +42,78 @@ if ($StartScript -ne 1){
         if (-not ($Input_FileName -eq "")){
             $InputPath = ($Input_FileBrowser.FileName)  # Final Input Path
             # File Selection for Icon File
-            $IconFile_FileBrowser = New-Object $FileBrowser
-            $IconFile_FileBrowser.InitialDirectory = $env:USERPROFILE
-            $IconFile_FileBrowser.Filter = 'Icon File (*.ico)|*.ico'
-            $IconFile_FileBrowser.ShowDialog() | Out-Null
-            $IconFilePath = ($IconFile_FileBrowser.FileName)  # Final Icon Path
-            # App Title from Input File Name
-            $AppTitleText = Select-String -Path $InputPath -Pattern "Global:AppName" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
-            if ($AppTitleText -ne $null){$AppTitle = (($($AppTitleText).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''}else{$AppTitle = $null}
-            # Get App Version from ps1 file code
-            $AppVersionText = Select-String -Path $InputPath -Pattern "Global:AppVer" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
-            if ($AppVersionText -ne $null){$AppVersion = (($($AppVersionText).Line -split "=" | select -Index 1) -replace " ","") -replace '"',''}else{$AppVersion = $null}
-            # Output File Name from Input File Name
-            $OutputFileNameBase = [System.IO.Path]::GetFileNameWithoutExtension($Input_FileBrowser.SafeFileName)  # Final Output Name
-            $OutputFileName = "$($OutputFileNameBase)_$($AppVersion).exe"
-            # Get Copyright Date from ps1 file code
-            $AppCopyrightDateString = Select-String -Path $InputPath -Pattern "Global:CpDate" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
-            if ($AppCopyrightDateString -ne $null){$AppCopyrightDate = (($($AppCopyrightDateString).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''}else{$AppCopyrightDate = $null}
-            $AppCopyrightAuthorString = Select-String -Path $InputPath -Pattern "Global:CpAuthor" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
-            if ($AppCopyrightAuthorString -ne $null){$AppCopyrightAuthor = (($($AppCopyrightAuthorString).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''}else{$AppCopyrightAuthor = $null}
-            $AppCopyright = "$($AppCopyrightAuthor) - $($AppCopyrightDate)"
-            # Set Output Directory same as Input Directory
-            $directorySet = [System.IO.Path]::GetDirectoryName($Input_FileBrowser.FileName)
+            $SelectIcon = Read-Host -Prompt "Start Icon File Selection (.ico)? Press 1 to continue.(not required)."
+            if ($SelectIcon -eq 1){
+                $IconFile_FileBrowser = New-Object $FileBrowser
+                $IconFile_FileBrowser.InitialDirectory = $env:USERPROFILE
+                $IconFile_FileBrowser.Filter = 'Icon File (*.ico)|*.ico'
+                $IconFile_FileBrowser.ShowDialog() | Out-Null
+                $IconFilePath = ($IconFile_FileBrowser.FileName)  # Final Icon Path
+            }else{
+                Write-Host "Skipping Icon File Selection"
+                $IconFilePath =$null
+                # App Title from Input File Name
+                $AppTitleText = Select-String -Path $InputPath -Pattern "Global:AppName" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
+                if ($AppTitleText -ne $null){$AppTitle = (($($AppTitleText).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''}else{$AppTitle = $null}
+                # Get App Version from ps1 file code
+                $AppVersionText = Select-String -Path $InputPath -Pattern "Global:AppVer" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
+                if ($AppVersionText -ne $null){$AppVersion = (($($AppVersionText).Line -split "=" | select -Index 1) -replace " ","") -replace '"',''}else{$AppVersion = $null}
+                # Output File Name from Input File Name
+                $OutputFileNameBase = [System.IO.Path]::GetFileNameWithoutExtension($Input_FileBrowser.SafeFileName)  # Final Output Name
+                $OutputFileName = "$($OutputFileNameBase)_$($AppVersion).exe"
+                # Get Copyright Date from ps1 file code
+                $AppCopyrightDateString = Select-String -Path $InputPath -Pattern "Global:CpDate" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
+                if ($AppCopyrightDateString -ne $null){$AppCopyrightDate = (($($AppCopyrightDateString).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''}else{$AppCopyrightDate = $null}
+                $AppCopyrightAuthorString = Select-String -Path $InputPath -Pattern "Global:CpAuthor" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
+                if ($AppCopyrightAuthorString -ne $null){$AppCopyrightAuthor = (($($AppCopyrightAuthorString).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''}else{$AppCopyrightAuthor = $null}
+                $AppCopyright = "$($AppCopyrightAuthor) - $($AppCopyrightDate)"
+                # Set Output Directory same as Input Directory
+                $directorySet = [System.IO.Path]::GetDirectoryName($Input_FileBrowser.FileName)
     
-            if ($AppTitle -eq "" -or $AppTitle -eq $null){
-                Write-Warning -Message "[Missing App Title. Required Item Needed]"
-                $AppTitle = (Read-Host "[Missing App Title. Please Enter App Title (Letters and Spaces Only)]") -replace '[^a-zA-Z ]', ''
-                if ($AppTitle -eq $null -or $AppTitle -eq ""){
-                    Write-Error -Message "Error missing app title. ERR(02)."
-                    Start-Sleep -Seconds 5
-                    Exit
+                if ($AppTitle -eq "" -or $AppTitle -eq $null){
+                    Write-Warning -Message "[Missing App Title. Required Item Needed]"
+                    $AppTitle = (Read-Host "[Missing App Title. Please Enter App Title (Letters and Spaces Only)]") -replace '[^a-zA-Z ]', ''
+                    if ($AppTitle -eq $null -or $AppTitle -eq ""){
+                        Write-Error -Message "Error missing app title. ERR(02)."
+                        Start-Sleep -Seconds 5
+                        Exit
+                    }
                 }
-            }
-            if ($AppVersion -eq "" -or $AppVersion -eq $null){
-                Write-Warning -Message "[Missing App Version. Required Item Needed]"
-                $AppVersion = (Read-Host "[Missing App Version. Please Enter Version Number (Numbers and .s only)]") -replace '[^0-9.]', ''
-                if ($AppVersion -eq $null -or $AppVersion -eq ""){
-                    Write-Error -Message "Error missing verion number. ERR(03)."
-                    Start-Sleep -Seconds 5
+                if ($AppVersion -eq "" -or $AppVersion -eq $null){
+                    Write-Warning -Message "[Missing App Version. Required Item Needed]"
+                    $AppVersion = (Read-Host "[Missing App Version. Please Enter Version Number (Numbers and .s only)]") -replace '[^0-9.]', ''
+                    if ($AppVersion -eq $null -or $AppVersion -eq ""){
+                        Write-Error -Message "Error missing verion number. ERR(03)."
+                        Start-Sleep -Seconds 5
+                        Exit
+                    }else{
+                        $OutputFileName = "$($OutputFileNameBase)_$($AppVersion).exe"
+                    }
+                }
+                if ($AppCopyright -eq "" -or $AppCopyright -eq $null){
+                    Write-Warning -Message "[Missing App Copyright. Using SYSTEM.Date and USERNAME as Copyright]"
+                    $AppCopyrightDate = Get-date -Format "MMMM yyyy"
+                    $AppCopyrightAuthor = $env:USERNAME
+                    $AppCopyright = "$($AppCopyrightAuthor) - $($AppCopyrightDate)"
+                }
+
+                Write-Host "      Createing EXE with Attributes`n=========================================`nApp Title        : $($AppTitle)`nApp Version      : $($AppVersion)`nInput File Path  : $($InputPath)`nOutput File Name : $($OutputFileName)`nIcon File path   : $($IconFilePath)`nCopyright        : $($AppCopyright)" -ForegroundColor Yellow
+
+                $confirmResult = Read-Host "Confirm Createing Executable?(y/n)"
+                $confirmResult = $confirmResult.ToLower()
+                if ($confirmResult -eq "y" -or $confirmResult -eq "yes"){
+                    Write-Host "Creating Executable. Please Wait." -ForegroundColor Yellow
+                    Invoke-ps2exe -inputFile $InputPath -outputFile "$($directorySet)\$($OutputFileName)" -iconFile $IconFilePath -title $AppTitle -version $AppVersion -copyright "$($AppCopyrightAuthor) - $($AppCopyrightDate)" -x64 -Verbose -noConsole | Out-Null
+                    if (Test-Path -Path "$($directorySet)\$($OutputFileName)"){Write-Host "Executable Created Successfully at : `"$($directorySet)\$($OutputFileName)`"" -ForegroundColor Green}else{Write-Host "Error with Executable Path"}
+                }elseif($confirmResult -eq "n" -or $confirmResult -eq "no"){
+                    Write-Host "Cancelling Creation."
+                    Start-Sleep -Seconds 2
                     Exit
                 }else{
-                    $OutputFileName = "$($OutputFileNameBase)_$($AppVersion).exe"
+                    Write-Host "Ibvalid Answer"
+                    Start-Sleep -Seconds 5
+                    Exit
                 }
-            }
-            if ($AppCopyright -eq "" -or $AppCopyright -eq $null){
-                Write-Warning -Message "[Missing App Copyright. Using SYSTEM.Date and USERNAME as Copyright]"
-                $AppCopyrightDate = Get-date -Format "MMMM yyyy"
-                $AppCopyrightAuthor = $env:USERNAME
-                $AppCopyright = "$($AppCopyrightAuthor) - $($AppCopyrightDate)"
-            }
-
-            Write-Host "      Createing EXE with Attributes"
-            Write-Host "========================================="
-            Write-Host "App Title        : $($AppTitle)"
-            Write-Host "App Version      : $($AppVersion)"
-            Write-Host "Input File Path  : $($InputPath)"
-            Write-Host "Output File Name : $($OutputFileName)"
-            Write-Host "Icon File path   : $($IconFilePath)"
-            Write-Host "Copyright        : $($AppCopyright)"
-
-            $confirmResult = Read-Host "Confirm Createing Executable?(y/n)"
-            $confirmResult = $confirmResult.ToLower()
-            if ($confirmResult -eq "y" -or $confirmResult -eq "yes"){
-                Write-Host "Creating Executable. Please Wait." -ForegroundColor Yellow
-                Invoke-ps2exe -inputFile $InputPath -outputFile "$($directorySet)\$($OutputFileName)" -iconFile $IconFilePath -title $AppTitle -version $AppVersion -copyright "$($AppCopyrightAuthor) - $($AppCopyrightDate)" -x64 -Verbose -noConsole
-            }elseif($confirmResult -eq "n" -or $confirmResult -eq "no"){
-                Write-Host "Cancelling Creation."
-                Start-Sleep -Seconds 2
-                Exit
-            }else{
-                Write-Host "Ibvalid Answer"
-                Start-Sleep -Seconds 5
-                Exit
             }
         }elseif($Input_FileName -eq ""){
             Write-Error -Message "No Input File Selected"
