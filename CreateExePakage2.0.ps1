@@ -1,6 +1,24 @@
-# Create Executable Package tool
-################################
-################################
+
+########################################################################################
+#
+#    -----------------------------------------------------------------------------------
+#    Application Name : Executable Packager 2.0
+#
+#    Date Created     : November 2025
+#
+#    Current as of    : November 2025
+#    -----------------------------------------------------------------------------------
+#    Functionality    : Create Executable From Ps1 file useing File selection
+#                     :
+#    -----------------------------------------------------------------------------------
+#
+########################################################################################
+########################################################################################
+
+$Global:AppName = "Executable Packager"
+$Global:AppVer = "2.0"
+$Global:CpDate = "November 2025"
+$Global:CpAuthor = "acybermonk"
 
 Write-Host "`n`n--- Welcome to the Executable Creation Tool ---"
 Write-Host "===============================================`n"
@@ -106,35 +124,17 @@ if ($StartScript -ne 1){
         $scriptBlockTest = 
         '
         Install-Module -Name ps2exe -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue -Verbose
-        Import-Module -Name ps2exe -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue 
+        Import-Module -Name ps2exe -Force -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+        $module_check = get-Module -Name ps2exe | select -Property Name -ExpandProperty Name
+        if (!$module_check -ne $null){
+            Write-Host "Install was successfull. Please reopen application."
+        }else{
+            Write-Error -Message "Error Could not install neccessary module"
+        }
         '
         Start-Process powershell.exe -Verb RunAs -Wait -ArgumentList $scriptBlockTest
         $module_check = get-Module -Name ps2exe | select -Property Name -ExpandProperty Name
-        if (!$module_check){
-            Write-Host "Install Successful"
-
-            # Read Inputs
-            $Root= ""
-            $InputPath = Read-Host "Enter Input Path (With Extension)"
-            $OutputFileName = Read-Host "Enter Output Path (With Extenstion)"
-            $IconFilePath = Read-Host "Enter Icon Path (With Extension)"
-            $AppTitle = Read-Host "Enter App Tittle"
-            $AppVersion = Read-Host "Enter App Version"
-            $AppCopyright = Read-Host "Enter Copyright Date"
-            $AppProduct = Read-Host "Enter App Product Name"
-    
-            # Manual Override
-            $Root= ""
-            $InputPath = "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\ctrlbr.ps1"
-            $OutputFileName = "ctrlbr.exe"
-            $IconFilePath = "C:\Users\Cybermonk\Proton Drive\for.captcha.only\My files\Code\Testing\iconRP_64.ico"
-            $AppTitle = "Control Bridge Utility"
-            $AppVersion = "1.11.25.19"
-            $AppCopyright = "November 2025"
-            $AppProduct = "Control Bridge"
-
-            Invoke-ps2exe -inputFile $InputPath -outputFile $OutputFileName -iconFile $IconFilePath -title $AppTitle -version $AppVersion -copyright $AppCopyright -product $AppProduct -x64 -requireAdmin -Verbose -noConsole
-        }else{
+        if ($module_check -ne $null){
             Write-Error "Error Installing Module. ERR(01)."
             Pause        
         }
