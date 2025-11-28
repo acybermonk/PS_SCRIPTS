@@ -2,12 +2,12 @@
 ########################################################################################
 #
 #    -----------------------------------------------------------------------------------
-#    Application Name : Executable Packager 2.0
+#    Application Name : Executable Package Creation Tool 2.0
 #
 #    Date Created     : November 2025
 #
 #    -----------------------------------------------------------------------------------
-#    Functionality    : Create Executable From Ps1 file useing File selection
+#    Functionality    : Create Executable From Ps1 file useing File selection 
 #                     :
 #    -----------------------------------------------------------------------------------
 #
@@ -19,8 +19,14 @@ $Global:AppVer = "2.0"
 $Global:CpDate = "November 2025"
 $Global:CpAuthor = "acybermonk"
 Add-Type -AssemblyName System.Windows.Forms
-Write-Host "--Welcome to the Executable Creation Tool--" -ForegroundColor Yellow
-$StartScript = Read-Host -Prompt "    Start File Selection? Press 1 to continue."
+Write-Host "`n--Welcome to the Executable Package Creation Tool--" -ForegroundColor Yellow
+Write-Host "`n**Global App Variables Used**" -ForegroundColor Yellow
+Write-Host "  -`$Global:AppTitle" -ForegroundColor Yellow
+Write-Host "  -`$Global:AppVersion" -ForegroundColor Yellow
+Write-Host "  -`$Global:AppCpDate" -ForegroundColor Yellow
+Write-Host "  -`$Global:AppCpAuthor" -ForegroundColor Yellow
+Write-Host "===================================`n" -ForegroundColor Yellow
+$StartScript = Read-Host -Prompt "Start File Selection?`n    Press 1 to continue..."
 if ($StartScript -ne 1){
     Write-Host "Cancelling. Goodbye for now." -ForegroundColor Yellow
     Exit
@@ -45,22 +51,57 @@ if ($StartScript -ne 1){
             $IconFile_FileBrowser = New-Object $FileBrowser
             $IconFile_FileBrowser.InitialDirectory = $directorySet
             $IconFile_FileBrowser.Filter = 'Icon File (*.ico)|*.ico'
-            $IconFile_FileBrowser.ShowDialog() | Out-Null
-            $IconFilePath = ($IconFile_FileBrowser.FileName)  # Final Icon Path
+            $StartIconSearch = Read-Host "Start Icon Selection (.ico)"
+            if ($StartIconSearch -eq 1){
+                $IconFile_FileBrowser.ShowDialog() | Out-Null
+                $IconFilePath = $IconFile_FileBrowser.FileName  # Final Icon Path
+            }else{
+                $IconFilePath = $null
+            }
             # App Title from Input File Name
             $AppTitleText = Select-String -Path $InputPath -Pattern "Global:AppTitle" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
-            if ($AppTitleText -ne $null){$AppTitle = (($($AppTitleText).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''}else{$AppTitle = $null}
+            if ($AppTitleText -ne $null){
+                $AppTitle = (($($AppTitleText).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''
+            }else{
+                $AppTitle = $null
+            }
+            # App Requirements for Elevation to run
+            $AppReqAdmText = Select-String -Path $InputPath -Pattern "Global:AppReqAdm" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
+            if ($AppReqAdmText -ne $null){
+                $AppReqAdm = (((($($AppReqAdmText).Line -split "=" | select -Index 1).Substring(1)) -replace '"','') -replace '\$','').toLower()
+                if ($AppReqAdm -eq "true"){
+                    [bool]$AppReAdmBool = $true
+                }elseif ($AppReqAdm -eq "false"){
+                    [bool]$AppReAdmBool = $false
+                }else{
+                    Write-Error -Message "Error not a valid Admin Requirement Arg"
+                }
+            }else{
+                [bool]$AppReAdmBool = $false
+            }
             # Get App Version from ps1 file code
             $AppVersionText = Select-String -Path $InputPath -Pattern "Global:AppVer" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
-            if ($AppVersionText -ne $null){$AppVersion = (($($AppVersionText).Line -split "=" | select -Index 1) -replace " ","") -replace '"',''}else{$AppVersion = $null}
+            if ($AppVersionText -ne $null){
+                $AppVersion = (($($AppVersionText).Line -split "=" | select -Index 1) -replace " ","") -replace '"',''
+            }else{
+                $AppVersion = $null
+            }
             # Output File Name from Input File Name
             $OutputFileNameBase = [System.IO.Path]::GetFileNameWithoutExtension($Input_FileBrowser.SafeFileName)  # Final Output Name
             $OutputFileName = "$($OutputFileNameBase)_$($AppVersion).exe"
             # Get Copyright Date from ps1 file code
-            $AppCopyrightDateString = Select-String -Path $InputPath -Pattern "Global:CpDate" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
-            if ($AppCopyrightDateString -ne $null){$AppCopyrightDate = (($($AppCopyrightDateString).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''}else{$AppCopyrightDate = $null}
-            $AppCopyrightAuthorString = Select-String -Path $InputPath -Pattern "Global:CpAuthor" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
-            if ($AppCopyrightAuthorString -ne $null){$AppCopyrightAuthor = (($($AppCopyrightAuthorString).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''}else{$AppCopyrightAuthor = $null}
+            $AppCopyrightDateString = Select-String -Path $InputPath -Pattern "Global:AppCpDate" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
+            if ($AppCopyrightDateString -ne $null){
+                $AppCopyrightDate = (($($AppCopyrightDateString).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''
+            }else{
+                $AppCopyrightDate = $null
+            }
+            $AppCopyrightAuthorString = Select-String -Path $InputPath -Pattern "Global:AppCpAuthor" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
+            if ($AppCopyrightAuthorString -ne $null){
+                $AppCopyrightAuthor = (($($AppCopyrightAuthorString).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''
+            }else{
+                $AppCopyrightAuthor = $null
+            }
             $AppCopyright = "$($AppCopyrightAuthor) - $($AppCopyrightDate)"
             # Set Output Directory same as Input Directory
             
@@ -92,18 +133,23 @@ if ($StartScript -ne 1){
                 $AppCopyright = "$($AppCopyrightAuthor) - $($AppCopyrightDate)"
             }
 
-            Write-Host "`n      Createing EXE with Attributes`n=========================================`nApp Title        : $($AppTitle)`nApp Version      : $($AppVersion)`nInput File Path  : $($InputPath)`nOutput File Name : $($OutputFileName)`nIcon File path   : $($IconFilePath)`nCopyright        : $($AppCopyright)"
-
+            Write-Host "`n Createing .EXE from .PS1 with Attributes`n===========================================`nApp Title        : $($AppTitle)`nApp Version      : $($AppVersion)`nInput File Path  : $($InputPath)`nOutput File Name : $($OutputFileName)`nIcon File path   : $($IconFilePath)`nCopyright        : $($AppCopyright)`nRequires Admin   : $($AppReAdmBool)`n-------------------------------------------`n`n" -ForegroundColor Yellow
+            
             $confirmResult = Read-Host "Confirm Createing Executable? (y/n)"
             $confirmResult = $confirmResult.ToLower()
             if ($confirmResult -eq "y" -or $confirmResult -eq "yes"){
                 Write-Host "Creating Executable. Please Wait." -ForegroundColor Yellow
                 if (Test-Path -Path "$($directorySet)\$($OutputFileName)"){
-                    Write-Warning "File already exists **($($directorySet)\$($OutputFileName)).**"
+                    Write-Warning "File already exists`n    **($($directorySet)\$($OutputFileName)).**"
                     $overRiteCont = Read-Host -Prompt "Do you want to overwrite the current file? (y/n)"
                     if ($overRiteCont -eq "y"){
-                        Write-Warning "Creating File **($($directorySet)\$($OutputFileName)).**"
-                        Invoke-ps2exe -inputFile $InputPath -outputFile "$($directorySet)\$($OutputFileName)" -iconFile $IconFilePath -title $AppTitle -version $AppVersion -copyright "$($AppCopyrightAuthor) - $($AppCopyrightDate)" -x64 -Verbose -noConsole | Out-Null
+                        if ($AppReAdmBool){
+                            Write-Warning "Creating File (Requires Admin)**($($directorySet)\$($OutputFileName)).**"
+                            Invoke-ps2exe -inputFile $InputPath -outputFile "$($directorySet)\$($OutputFileName)" -iconFile $IconFilePath -title $AppTitle -version $AppVersion -copyright "$($AppCopyrightAuthor) - $($AppCopyrightDate)" -requireAdmin -x64 -Verbose -noConsole | Out-Null
+                        }else{
+                            Write-Warning "Creating File **($($directorySet)\$($OutputFileName)).**"
+                            Invoke-ps2exe -inputFile $InputPath -outputFile "$($directorySet)\$($OutputFileName)" -iconFile $IconFilePath -title $AppTitle -version $AppVersion -copyright "$($AppCopyrightAuthor) - $($AppCopyrightDate)" -x64 -Verbose -noConsole | Out-Null
+                        }
                         if (Test-Path -Path "$($directorySet)\$($OutputFileName)"){
                             Write-Host "** File ($($OutputFileName)) created Successfully. **`n`n    Directory : `"$($directorySet)`"" -ForegroundColor Green
                         }
