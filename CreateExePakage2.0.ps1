@@ -48,7 +48,7 @@ if ($StartScript -ne 1){
             $IconFile_FileBrowser.ShowDialog() | Out-Null
             $IconFilePath = ($IconFile_FileBrowser.FileName)  # Final Icon Path
             # App Title from Input File Name
-            $AppTitleText = Select-String -Path $InputPath -Pattern "Global:AppName" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
+            $AppTitleText = Select-String -Path $InputPath -Pattern "Global:AppTitle" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
             if ($AppTitleText -ne $null){$AppTitle = (($($AppTitleText).Line -split "=" | select -Index 1).Substring(1)) -replace '"',''}else{$AppTitle = $null}
             # Get App Version from ps1 file code
             $AppVersionText = Select-String -Path $InputPath -Pattern "Global:AppVer" -Context 0,0 -ErrorAction SilentlyContinue | select -Index 0
