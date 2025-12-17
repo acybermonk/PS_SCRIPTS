@@ -5,6 +5,11 @@
 #    Application Name : Executable Package Creation Tool 2.0
 #
 #    Date Created     : November 2025
+#                 _                         _   
+#     ___ ___ _ _| |_ ___ ___ _____ ___ ___| |_ 
+#    | .'|  _| | | . | -_|  _|     | . |   | '_|
+#    |__,|___|_  |___|___|_| |_|_|_|___|_|_|_,_|
+#            |___|   
 #
 #    -----------------------------------------------------------------------------------
 #    Functionality    : Create Executable From Ps1 file useing File selection 
@@ -17,15 +22,20 @@
 $Global:AppName = "Executable Packager"
 $Global:AppVer = "2.0"
 $Global:CpDate = "November 2025"
+$logoText = "=                 _                         _   `n=     ___ ___ _ _| |_ ___ ___ _____ ___ ___| |_ `n=    | .'|  _| | | . | -_|  _|     | . |   | '_|`n=    |__,|___|_  |___|___|_| |_|_|_|___|_|_|_,_|`n=            |___|"
+#Updated 12/16/2025
 $Global:CpAuthor = "acybermonk"
 Add-Type -AssemblyName System.Windows.Forms
-Write-Host "`n--Welcome to the Executable Package Creation Tool--" -ForegroundColor Yellow
-Write-Host "`n**Global App Variables Used**" -ForegroundColor Yellow
-Write-Host "  -`$Global:AppTitle" -ForegroundColor Yellow
-Write-Host "  -`$Global:AppVersion" -ForegroundColor Yellow
-Write-Host "  -`$Global:AppCpDate" -ForegroundColor Yellow
-Write-Host "  -`$Global:AppCpAuthor" -ForegroundColor Yellow
-Write-Host "===================================`n" -ForegroundColor Yellow
+Write-Host "==========================================================" -ForegroundColor Yellow
+Write-Host $logoText -ForegroundColor Yellow
+Write-Host "=`n=  --Welcome to the Executable Package Creation Tool--" -ForegroundColor Yellow
+Write-Host "=`n=  **Global App Variables Required for Autofill**" -ForegroundColor Yellow
+Write-Host "=    -`$Global:AppTitle" -ForegroundColor Yellow
+Write-Host "=    -`$Global:AppVersion" -ForegroundColor Yellow
+Write-Host "=    -`$Global:AppCpDate" -ForegroundColor Yellow
+Write-Host "=    -`$Global:AppCpAuthor" -ForegroundColor Yellow
+Write-Host "=    -`$Global:AppReqAdm" -ForegroundColor Yellow
+Write-Host "=`n=========================================================`n" -ForegroundColor Yellow
 $StartScript = Read-Host -Prompt "Start File Selection?`n    Press 1 to continue..."
 if ($StartScript -ne 1){
     Write-Host "Cancelling. Goodbye for now." -ForegroundColor Yellow
@@ -202,3 +212,4 @@ if ($StartScript -ne 1){
         }
     }
 }
+
