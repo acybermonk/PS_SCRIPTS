@@ -14,9 +14,16 @@
     This is an install Package Created to pull in the latest HP version 
 .DESCRIPTION
     This Package is to install the latest version of HPIA.
-    - checks Script Repo for updates (Local / Git)
     - Stops all HP Image Assistant instances on the device (all users)
-    - Stops 
+    - Validates image and Icon files are accessible locally
+    - Validates current HPIA version on system 
+    - Updates to newest from HP website for HPIA and installs
+    - Runs HPIA and checks for all updates
+    - Reads JSON file output from HPIA for applied updates
+    - Checks for Pending Restart
+    - Insalls / Uses Burnt Toast 8.5 to send nofication
+    - Option reboot option if needed with slight delay
+    
 .VERSION
     2.0
 .AUTHOR
