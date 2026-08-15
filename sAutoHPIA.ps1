@@ -24,7 +24,6 @@
     - Checks for Pending Restart
     - Insalls / Uses Burnt Toast 8.5 to send nofication
     - Option reboot option if needed with slight delay
-    
 .VERSION
     - 2.0
 .AUTHOR
