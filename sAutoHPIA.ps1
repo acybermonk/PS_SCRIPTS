@@ -91,44 +91,6 @@ function Log-Error($errVariable) {
     }
 
 #----------------------------------------------------------------#
-# Repo Check (New Script Version)
-
-## Needs updated (not in use)
-#----------------------------------------------------------------#
-    function CheckRepo {
-        $repoFile  = "toolsapprepo.xml"
-        $repoPath = "\\lewvdeployops\deploy\tools\toolsrepo\$($repoFile)"
-        try {
-            # Validate that the file exists
-            if (-not (Test-Path -Path $repoPath)) {
-                throw "Repository not found"
-            }
-
-            # Load the XML file into an XML object
-            [xml]$xmlData = Get-Content -Path $repoPath -ErrorAction Stop
-
-            # Display the raw XML structure
-            #Write-Host "Repo Validated" -ForegroundColor Green
-            #$xmlData
-
-            foreach ($app in $xmlData.repository.app) {
-                if ($app.name -eq $appName){
-                    if ($app.version -eq $appVer){
-                        Write-Host "Repo App Version : $($app.version) Validated"
-                    }else{
-                        Write-Host "Repo App Version : $($app.version) Invalid. Updating to Current Version"
-                    }
-                }else{
-                    Write-Host "No App Repo Found" -ForegroundColor Red
-                }
-            }
-        } catch {
-            Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
-            Write-Warning "Canot connect to validate with repository." 
-        }
-    }
-
-#----------------------------------------------------------------#
 # Validate Image / Icon Download from HP base site / server repo
 
 # Icon is created for shortcut from the HP Image downloaded
