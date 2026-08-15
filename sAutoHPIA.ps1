@@ -721,13 +721,13 @@ function ToastMessageNotify {
     $Global:version_Download = "hpia-ver-unknown"
     Log-Message " -Varables unpacked and added"
 
-    $server = "\\lewvdeployops"
+    $server = "\\serverName"
     $image = "hp.png"
     $icon = "hp.ico"
 
-    $psoRepoPath = "$($server)\Deploy\Tools\AutoHPIA"
-    $imageRepoPath = "$($server)\Deploy\img\repo"
-    $iconRepoPath = "$($server)\Deploy\img\repo\ico"
+    $psoRepoPath = "$($server)\Auto\AutoHPIA"
+    $imageRepoPath = "$($server)\Auto\img\repo"
+    $iconRepoPath = "$($server)\Auto\img\repo\ico"
 
     # HPIA Viaribles
     $hpiaLogDir = "C:\Logs\Auto\HPIA\Auto_HPIA_LOGS"
