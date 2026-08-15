@@ -29,6 +29,7 @@
 .AUTHOR
     - Daniel Krysty
 #>
+
 #----------------------------------------------------------------#
 #     Silent HPIA Online Installer (Direct from HP)
 #     Created : 2026
@@ -111,7 +112,6 @@ function Log-Error($errVariable) {
             HPDownloadImage
             if (-not (Test-Path -Path "$($env:APPDATA)\HP\$($icon)")){
                 ServerDownloadIcon
-                #CreateIcon -bitmapPath $Global:appImageFile -iconPath "$($env:APPDATA)\HP\$($icon)"
             }else{
                 $Global:appIconFile = "$($env:APPDATA)\HP\$($icon)"
             }
@@ -119,7 +119,6 @@ function Log-Error($errVariable) {
             $Global:appImageFile = "$($env:APPDATA)\HP\$($image)"
             if (-not (Test-Path -Path "$($env:APPDATA)\HP\$($icon)")){
                 ServerDownloadIcon
-                #CreateIcon -bitmapPath $Global:appImageFile -iconPath "$($env:APPDATA)\HP\$($icon)"
             }else{
                 $Global:appIconFile = "$($env:APPDATA)\HP\$($icon)"
             }
@@ -149,7 +148,6 @@ function Log-Error($errVariable) {
                 }else{
                     Log-Error $errImage1
                     ServerDownloadImage
-                    #CreateIcon -bitmapPath $Global:appImageFile -iconPath $Global:appIconFile
                 }
             }elseif ($imageUrls -ge 2){
                 $errImage2 = $null
@@ -165,19 +163,16 @@ function Log-Error($errVariable) {
                     }else{
                         Log-Error $errImage2
                         ServerDownloadImage
-                        #CreateIcon -bitmapPath $Global:appImageFile -iconPath $Global:appIconFile
                     }
                     break
                 }
             }else{
                 Log-Message "No images located on page based on HTML REGEX"
                 ServerDownloadImage
-                #CreateIcon -bitmapPath $Global:appImageFile -iconPath $Global:appIconFile
             }
         }else{
             Log-Error $InvokeRequestErr
             ServerDownloadImage
-            #CreateIcon -bitmapPath $Global:appImageFile -iconPath $Global:appIconFile
         }
     }
 
@@ -203,7 +198,6 @@ function Log-Error($errVariable) {
 
     function ServerDownloadImage {
         Log-Message "Attempting to download the image file from server repository"
-        #$Global:appImageFile = "."
         if (-not (Test-Path -Path "$($env:APPDATA)\HP\$($image)")){
             Log-Message " -Image not present and attempting to copy from repository"
             if (Test-Path -Path $imageRepoPath){
@@ -231,7 +225,6 @@ function Log-Error($errVariable) {
 
     function ServerDownloadIcon {
         Log-Message "Attempting to download the icon file from server repository"
-        #$Global:appImageFile = "."
         if (-not (Test-Path -Path "$($env:APPDATA)\HP\$($icon)")){
             Log-Message " -Icon not present and attempting to copy from repository"
             if (Test-Path -Path $iconRepoPath){
@@ -336,8 +329,6 @@ function Log-Error($errVariable) {
             Start-Process -FilePath "C:\SWSetup\$($version_Download)\HPImageAssistant.exe" -ErrorVariable +RunHPIALocalErr -Wait -ArgumentList "/Silent /Operation:Analyze /Selection:All /Action:Install /Debug /LogFolder:$($hpiaLogDir) /ProxyURL:$($proxyURL) /ProxyPort:$($proxyPort) /ReportFolder:$($hpiaReportDir) /Format:JSON /SoftpaqDownloadFolder:C:\HPIA\download_${DateShort} /AutoCleanup"
             if (-not ($RunHPIALocalErr)){
                 Log-Message " -HPIA Proccess Completed"
-                #CreateIcon -bitmapPath $Global:appImageFile -iconPath $Global:appIconFile
-                #CreateShortcut
                 ReadJSONReport
                 ToastMessageNotify
                 Exit
@@ -354,7 +345,7 @@ function Log-Error($errVariable) {
 #----------------------------------------------------------------#
 # Remove old Shortcuts Create Shortcut 
 
-## Validated
+## Removed
 #----------------------------------------------------------------#
     function CreateShortcut {
         Log-Message "Checking for old shortcurts on system`n($($env:USERPROFILE)\Desktop)"
@@ -706,7 +697,7 @@ function ToastMessageNotify {
 #----------------------------------------------------------------#
 # Setting variables
 #----------------------------------------------------------------#
-    $AppTitle = "AutoHPIA"
+    $AppTitle = "sAutoHPIA"
     $AppVersion = "2.0"
     $AppCpDate = "July 2026"
     $AppCpAuthor = "acybermonk"
@@ -746,6 +737,6 @@ function ToastMessageNotify {
     RemoveTempDirectory
     ReadJSONReport
     ToastMessageNotify
-    #SetUpdateCadence
+    #SetUpdateCadence v2.1.0
 
     Exit
