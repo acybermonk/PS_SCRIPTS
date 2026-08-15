@@ -11,7 +11,8 @@
 # #----------------------------------------------------------------#
 <#
 .SYNOPSIS
-    This is an install Package Created to pull in the latest HP version 
+    - This is an Update / Install Package created to pull in the latest HP Image Assistant and update system.
+    - Can be packaged into an executable / signed and added to an automated scheduled task for fleet
 .DESCRIPTION
     This Package is to install the latest version of HPIA.
     - Stops all HP Image Assistant instances on the device (all users)
@@ -25,9 +26,9 @@
     - Option reboot option if needed with slight delay
     
 .VERSION
-    2.0
+    - 2.0
 .AUTHOR
-    Daniel Krysty
+    - Daniel Krysty
 #>
 #----------------------------------------------------------------#
 #     Silent HPIA Online Installer (Direct from HP)
