@@ -477,7 +477,7 @@ function RemoveTempDirectory {
 #----------------------------------------------------------------#
 
 function ReadJSONReport {
-    $rebootRequired = $false
+    $Global:rebootRequired = $false
     $Global:Summary = $null
     $reportFile = $null
     $reportFile = Get-ChildItem -Path $hpiaReportDir | Where-Object { $_.Extension -eq ".json" }
@@ -531,7 +531,7 @@ function ReadJSONReport {
                             Log-Message " -Return Details : $($recLong)"
                         }
                         if ($recReboot -eq "REBOOT"){
-                            $rebootRequired = $true
+                            $Global:rebootRequired = $true
                             Log-Message " -Reboot : Required"
                         }elseif($recReboot -eq "NOREBOOT"){
                             Log-Message " -Reboot : Not Required"
